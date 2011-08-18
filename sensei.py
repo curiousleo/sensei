@@ -40,7 +40,11 @@ class Sudoku(object):
             if row in 'CF': out += line + '\n'
 
         return out
-        
+
+    @property
+    def solved(self):
+        return all(len(self[cell]) is 1 for cell in CELLS)
+
     def assign(self, key, value):
         '''(1) If a cell has only one possible value, then eliminate that value
         from the cell's peers.'''
@@ -115,3 +119,5 @@ class SudokuFile(object):
 
 if __name__ == '__main__':
     pass
+
+# : vi: set expandtab softtabstop=4 tabstop=4 :
