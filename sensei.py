@@ -54,6 +54,7 @@ class Sudoku(object):
         
             for peer in PEERS[key]:
                 self[peer].difference_update(set([value]))
+                if len(self[peer]) is 0: return False
 
             return True
         return False
@@ -71,51 +72,33 @@ class Sudoku(object):
                         changed = True
         if changed: self.eliminate()
 
-class Sensei(object):
-    @classmethod
-    def solve(cls, sudoku):
-        if all(len(sudoku[cell]) for cell in CELLS) is 1:
-            return True
-        sudoku.eliminate()
+def solve(sudoku):
+    sudoku.eliminate()
+    if not sudoku.solved:
+        n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
+                len(sudoku[cell]) > 1)
+        guess_sudoku = deepcopy(sudoku)
+        for guess in guess_sudoku[cell]:
+            print('Guessed {0} for cell {1}'.format(guess, cell), end=' ')
+            if not guess_sudoku.assign(cell, guess):
+                print('... didn\'t work.')
+                continue
+            print('... worked.')
+            return solve(guess_sudoku)
+    else: return sudoku
 
-class SudokuFile(object):
-    def __init__(self, filename):
-        with open(file=filename, mode='r') as sudoku_file:
-            self._filecontents = [line.strip() for line in sudoku_file]
+def sudoku_from_str(sudoku_str):
+    assert(len(sudoku_str) == 81)
 
-        self._filecontents = [line for line in self._filecontents if len(line) in (81, 9)]
-        self._line = 0
+    sudoku = Sudoku()
 
-    def __iter__(self):
-        self._line = 0
-        return self
+    values = dict(zip(CELLS, sudoku_str))
+    values = dict((k, int(v)) for k, v in values.items() if v in '123456789')
 
-    def __next__(self):
-        sudoku_str = ''
-        try: sudoku_str = self._filecontents[self._line]
-        except IndexError: raise StopIteration
-        if len(sudoku_str) is 9:
-            sudoku_str += ''.join(self._filecontents[self._line + i] for i in range(1, 9))
-            self._line += 9
-        elif len(self._filecontents[self._line]) is 81:
-            self._line += 1
-        else:
-            raise Exception('Cannot read input file: ' + sudoku_str)
+    for k, v in values.items():
+        sudoku.assign(k, v)
 
-        return self.sudoku_from_str(sudoku_str)
-
-    def sudoku_from_str(self, sudoku_str):
-        assert(len(sudoku_str) == 81)
-
-        sudoku = Sudoku()
-
-        values = dict(zip(CELLS, sudoku_str))
-        values = dict((k, int(v)) for k, v in values.items() if v in '123456789')
-        
-        for k, v in values.items():
-            sudoku.assign(k, v)
-
-        return sudoku
+    return sudoku
 
 if __name__ == '__main__':
     pass
