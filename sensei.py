@@ -93,17 +93,19 @@ def solve(sudoku):
     n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
         len(sudoku[cell]) > 1)
     for guess in sudoku[cell]:
-        print('Guessed {0} for cell {1}'.format(guess, cell))
+        # print('Guessed {0} for cell {1}'.format(guess, cell))
         guess_sudoku = deepcopy(sudoku)
         try:
             guess_sudoku.assign(cell, guess)
             guess_sudoku.eliminate()
         except SudokuContradictionError as error:
-            print('Contradiction found: {0}'.format(error))
+            # print('Contradiction found: {0}'.format(error))
             continue
-        return solve(guess_sudoku)
+        solution = solve(guess_sudoku)
+        if solution: return solution
+        else: continue
 
-    raise SudokuContradictionError('Sudoku could not be solved')
+    return False
 
 def sudoku_from_str(sudoku_str):
     assert(len(sudoku_str) == 81)
@@ -129,5 +131,3 @@ def sudokus_from_file(filename):
 
 if __name__ == '__main__':
     pass
-
-# : vi: set expandtab softtabstop=4 tabstop=4 :
