@@ -1,4 +1,4 @@
-from copy import deepcopy
+from copy import copy, deepcopy
 import logging
 from time import clock
 from multiprocessing import Pool
@@ -17,72 +17,6 @@ UNITS = ([cross(ROWS, c) for c in COLS]
 unitdict = dict((s, [u for u in UNITS if s in u]) for s in CELLS)
 PEERS = dict((s, set(sum(unitdict[s],[]))-set([s])) for s in CELLS)
 
-class Sudoku(object):
-    def __init__(self):
-        self._sudoku_data = [deepcopy(VALUES) for i in range(81)]
-        
-    def __getitem__(self, cell):
-        return self._sudoku_data[ROWS.index(cell[0]) * 9 + COLS.index(cell[1])]
-            
-    def __setitem__(self, cell, value):
-        if type(value) is int:
-            value = set([value])
-        elif type(value) is list or type(value) is tuple:
-            value = set(value)
-
-        self._sudoku_data[ROWS.index(cell[0]) * 9 + COLS.index(cell[1])] = value
-
-    def __repr__(self):
-        width = 1 + max(len(self[c]) for c in CELLS)
-        line = '+'.join(['-'*(width*3)]*3)
-
-        out = ''
-
-        for row in ROWS:
-            out += ''.join(''.join(str(i) for i in self[row+col]).center(width)+('|' if col in '36' else '') for col in COLS) + '\n'
-            if row in 'CF': out += line + '\n'
-
-        return out
-
-    @property
-    def solved(self):
-        return all(len(self[cell]) is 1 for cell in CELLS)
-
-    def assign(self, cell, value):
-        '''(1) If a cell has only one possible value, then eliminate that value
-        from the cell's peers.'''
-        assert(type(value) is int)
-        if value in self[cell]:
-            self[cell] = value
-            logging.debug('Assigned {0} to {1}'.format(value, cell))
-        
-            for peer in PEERS[cell]:
-                # possibilities = len(self[peer])
-                self[peer].difference_update(set([value]))
-                if len(self[peer]) is 0:
-                    raise SudokuContradictionError('Peer {0} reduced to zero'.format(peer))
-                # elif len(self[peer]) is 1 and possibilities is not 1:
-                    # self.assign(peer, next(iter(self[peer])))
-
-            return True
-        else:
-            raise ValueError('Cell {0} [{1}] does not contain {2}'.format(cell,
-                self[cell], value))
-
-    def eliminate(self):
-        '''(2) If a unit has only one possible place for a value, then put the
-        value there.'''
-        changed = False
-        for unit in UNITS:
-            for value in VALUES:
-                cells = [cell for cell in unit if value in self[cell]]
-                if len(cells) is 1:
-                    if len(self[cells[0]]) is not 1:
-                        # if not self.assign(cells[0], value): return False
-                        self.assign(cells[0], value)
-                        changed = True
-        if changed: self.eliminate()
-
 class SudokuContradictionError(Exception):
     def __init__(self, value):
         self.value = value
@@ -90,17 +24,66 @@ class SudokuContradictionError(Exception):
     def __str__(self):
         return repr(self.value)
 
-def solve(sudoku):
-    if sudoku.solved: return sudoku
+def solved(sudoku):
+    return all(len(value[1]) == 1 for value in sudoku.items())
 
-    n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
-        len(sudoku[cell]) > 1)
+def display(sudoku):
+    width = 1 + max(len(sudoku[c]) for c in CELLS)
+    line = '+'.join(['-'*(width*3)]*3)
+
+    out = ''
+
+    for row in ROWS:
+        out += ''.join(''.join(str(i) for i in sudoku[row+col]).center(width)+('|' if col in '36' else '') for col in COLS) + '\n'
+        if row in 'CF': out += line + '\n'
+
+    print(out)
+
+def assign(sudoku, cell, value):
+    '''(1) If a cell has only one possible value, then eliminate that value
+    from the cell's peers.'''
+    assert(type(value) is int)
+    if value in sudoku[cell]:
+        sudoku[cell] = set([value])
+        logging.debug('Assigned {0} to {1}'.format(value, cell))
+    
+        for peer in PEERS[cell]:
+            sudoku[peer].difference_update(set([value]))
+            if len(sudoku[peer]) is 0:
+                raise SudokuContradictionError('Peer {0} reduced to zero'.format(peer))
+
+        return True
+    else:
+        raise ValueError('Cell {0} [{1}] does not contain {2}'.format(cell,
+            sudoku[cell], value))
+
+def eliminate(sudoku):
+    '''(2) If a unit has only one possible place for a value, then put the
+    value there.'''
+    changed = False
+    for unit in UNITS:
+        for value in VALUES:
+            cells = [cell for cell in unit if value in sudoku[cell]]
+            if len(cells) is 1:
+                if len(sudoku[cells[0]]) is not 1:
+                    assign(sudoku, cells[0], value)
+                    changed = True
+    if changed: eliminate(sudoku)
+
+def solve(sudoku):
+    if solved(sudoku): return sudoku
+
+    try:
+        n, cell = min((len(sudoku[cell]), cell) for cell in sudoku if len(sudoku[cell]) > 1)
+    except ValueError:
+        display(sudoku)
+        raise RuntimeError
     for guess in sudoku[cell]:
         logging.debug('Guessed {0} for cell {1}'.format(guess, cell))
         guess_sudoku = deepcopy(sudoku)
         try:
-            guess_sudoku.assign(cell, guess)
-            guess_sudoku.eliminate()
+            assign(guess_sudoku, cell, guess)
+            eliminate(guess_sudoku)
         except SudokuContradictionError as error:
             logging.debug('Contradiction found: {0}'.format(error))
             continue
@@ -113,14 +96,12 @@ def solve(sudoku):
 def sudoku_from_str(sudoku_str):
     assert(len(sudoku_str) == 81)
 
-    sudoku = Sudoku()
+    sudoku = dict(zip(CELLS, (copy(VALUES) for i in range(81))))
 
     values = dict(zip(CELLS, sudoku_str))
     values = dict((k, int(v)) for k, v in values.items() if v in '123456789')
 
-    for k, v in values.items():
-        if not sudoku.assign(k, v):
-            return False
+    for k, v in values.items(): assign(sudoku, k, v)
 
     return sudoku
 
@@ -140,16 +121,6 @@ def solve_file(filename):
     print('Solving {} (using multiprocessing) ...'.format(filename))
     pool = Pool()
     results = pool.map(solve_worker, sudokus_from_file(filename))
-    total = len(results)
-    solved = len([result for result in results if result[0]])
-    time_taken = [t for (r, t) in results]
-    print('Solved {} of {} sudokus (avg {:.2f} secs ({:.0f} Hz), min {:.2f} secs, max {:.2f} secs, total {:.2f})' \
-            .format(solved, total, sum(time_taken)/total, total/sum(time_taken),
-                min(time_taken), max(time_taken), sum(time_taken)))
-
-def solve_file_single(filename):
-    print('Solving {} ...'.format(filename))
-    results = [solve_worker(sudoku) for sudoku in sudokus_from_file(filename)]
     total = len(results)
     solved = len([result for result in results if result[0]])
     time_taken = [t for (r, t) in results]
