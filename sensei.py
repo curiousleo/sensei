@@ -1,6 +1,6 @@
 from copy import deepcopy
 
-S1_STR = '.94...13..............76..2.8..1.....32.........2...6.....5.4.......8..7..63.4..8'
+S1_STR = '...6....445....2......893..97......3.63........4..27..6.9.5.............5....3.61'
 
 ROWS = 'ABCDEFGHI'
 COLS = '123456789'
@@ -18,16 +18,16 @@ class Sudoku(object):
     def __init__(self):
         self._sudoku_data = [deepcopy(VALUES) for i in range(81)]
         
-    def __getitem__(self, key):
-        return self._sudoku_data[ROWS.index(key[0]) * 9 + COLS.index(key[1])]
+    def __getitem__(self, cell):
+        return self._sudoku_data[ROWS.index(cell[0]) * 9 + COLS.index(cell[1])]
             
-    def __setitem__(self, key, value):
+    def __setitem__(self, cell, value):
         if type(value) is int:
             value = set([value])
         elif type(value) is list or type(value) is tuple:
             value = set(value)
 
-        self._sudoku_data[ROWS.index(key[0]) * 9 + COLS.index(key[1])] = value
+        self._sudoku_data[ROWS.index(cell[0]) * 9 + COLS.index(cell[1])] = value
 
     def __repr__(self):
         width = 1 + max(len(self[c]) for c in CELLS)
@@ -45,19 +45,26 @@ class Sudoku(object):
     def solved(self):
         return all(len(self[cell]) is 1 for cell in CELLS)
 
-    def assign(self, key, value):
+    def assign(self, cell, value):
         '''(1) If a cell has only one possible value, then eliminate that value
         from the cell's peers.'''
         assert(type(value) is int)
-        if value in self[key]:
-            self[key] = value
+        if value in self[cell]:
+            self[cell] = value
+            # print('Assigned {0} to {1}'.format(value, cell))
         
-            for peer in PEERS[key]:
+            for peer in PEERS[cell]:
+                # possibilities = len(self[peer])
                 self[peer].difference_update(set([value]))
-                if len(self[peer]) is 0: return False
+                if len(self[peer]) is 0:
+                    raise SudokuContradictionError('Peer {0} reduced to zero'.format(peer))
+                # elif len(self[peer]) is 1 and possibilities is not 1:
+                    # self.assign(peer, next(iter(self[peer])))
 
             return True
-        return False
+        else:
+            raise ValueError('Cell {0} [{1}] does not contain {2}'.format(cell,
+                self[cell], value))
 
     def eliminate(self):
         '''(2) If a unit has only one possible place for a value, then put the
@@ -68,24 +75,35 @@ class Sudoku(object):
                 cells = [cell for cell in unit if value in self[cell]]
                 if len(cells) is 1:
                     if len(self[cells[0]]) is not 1:
+                        # if not self.assign(cells[0], value): return False
                         self.assign(cells[0], value)
                         changed = True
         if changed: self.eliminate()
 
+class SudokuContradictionError(Exception):
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return repr(self.value)
+
 def solve(sudoku):
-    sudoku.eliminate()
-    if not sudoku.solved:
-        n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
-                len(sudoku[cell]) > 1)
+    if sudoku.solved: return sudoku
+
+    n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
+        len(sudoku[cell]) > 1)
+    for guess in sudoku[cell]:
+        print('Guessed {0} for cell {1}'.format(guess, cell))
         guess_sudoku = deepcopy(sudoku)
-        for guess in guess_sudoku[cell]:
-            print('Guessed {0} for cell {1}'.format(guess, cell), end=' ')
-            if not guess_sudoku.assign(cell, guess):
-                print('... didn\'t work.')
-                continue
-            print('... worked.')
-            return solve(guess_sudoku)
-    else: return sudoku
+        try:
+            guess_sudoku.assign(cell, guess)
+            guess_sudoku.eliminate()
+        except SudokuContradictionError as error:
+            print('Contradiction found: {0}'.format(error))
+            continue
+        return solve(guess_sudoku)
+
+    raise SudokuContradictionError('Sudoku could not be solved')
 
 def sudoku_from_str(sudoku_str):
     assert(len(sudoku_str) == 81)
@@ -96,9 +114,18 @@ def sudoku_from_str(sudoku_str):
     values = dict((k, int(v)) for k, v in values.items() if v in '123456789')
 
     for k, v in values.items():
-        sudoku.assign(k, v)
+        if not sudoku.assign(k, v):
+            return False
 
     return sudoku
+
+def sudokus_from_file(filename):
+    no = 1
+    with open(file=filename, mode='r') as sudoku_file:
+        for line in sudoku_file:
+            print('Sudoku #{0}'.format(no))
+            yield sudoku_from_str(line.strip())
+            no += 1
 
 if __name__ == '__main__':
     pass
