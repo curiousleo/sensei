@@ -1,5 +1,7 @@
 from copy import deepcopy
-from logging import debug
+import logging
+import time
+from multiprocessing import Pool
 
 S1_STR = '...6....445....2......893..97......3.63........4..27..6.9.5.............5....3.61'
 
@@ -52,7 +54,7 @@ class Sudoku(object):
         assert(type(value) is int)
         if value in self[cell]:
             self[cell] = value
-            debug('Assigned {0} to {1}'.format(value, cell))
+            logging.debug('Assigned {0} to {1}'.format(value, cell))
         
             for peer in PEERS[cell]:
                 # possibilities = len(self[peer])
@@ -94,13 +96,13 @@ def solve(sudoku):
     n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
         len(sudoku[cell]) > 1)
     for guess in sudoku[cell]:
-        debug('Guessed {0} for cell {1}'.format(guess, cell))
+        logging.debug('Guessed {0} for cell {1}'.format(guess, cell))
         guess_sudoku = deepcopy(sudoku)
         try:
             guess_sudoku.assign(cell, guess)
             guess_sudoku.eliminate()
         except SudokuContradictionError as error:
-            debug('Contradiction found: {0}'.format(error))
+            logging.debug('Contradiction found: {0}'.format(error))
             continue
         solution = solve(guess_sudoku)
         if solution: return solution
@@ -135,19 +137,21 @@ def sudokus_from_file(filename):
             if len(line) is 81: yield sudoku_from_str(line)
 
 def solve_file(filename):
-    import time
-    time_taken = []
-    unsolved = 0
-    total = 0
     print('Solving {} ...'.format(filename))
-    for sudoku in sudokus_from_file(filename):
-        start = time.clock()
-        if solve(sudoku) is False: unsolved += 1
-        time_taken += [time.clock() - start]
-        total += 1
-    print('Solved {} of {} sudokus (avg {:.2f} secs ({:.0f} Hz), min {:.2f} secs, max {:.2f} secs)' \
-            .format(total-unsolved, total, sum(time_taken)/total,
-                total/sum(time_taken), min(time_taken), max(time_taken)))
+    pool = Pool()
+    results = pool.map(solve_worker, sudokus_from_file(filename))
+    total = len(results)
+    solved = len([result for result in results if result[0]])
+    time_taken = [t for (r, t) in results]
+    print('Solved {} of {} sudokus (avg {:.2f} secs ({:.0f} Hz), min {:.2f} secs, max {:.2f} secs, total {:.2f})' \
+            .format(solved, total, sum(time_taken)/total, total/sum(time_taken),
+                min(time_taken), max(time_taken), sum(time_taken)))
+
+def solve_worker(sudoku):
+    start = time.clock()
+    result = solve(sudoku)
+    time_taken = time.clock() - start
+    return(bool(result), time_taken)
 
 if __name__ == '__main__':
     pass
