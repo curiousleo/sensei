@@ -1,4 +1,5 @@
 from copy import deepcopy
+from logging import debug
 
 S1_STR = '...6....445....2......893..97......3.63........4..27..6.9.5.............5....3.61'
 
@@ -51,7 +52,7 @@ class Sudoku(object):
         assert(type(value) is int)
         if value in self[cell]:
             self[cell] = value
-            # print('Assigned {0} to {1}'.format(value, cell))
+            debug('Assigned {0} to {1}'.format(value, cell))
         
             for peer in PEERS[cell]:
                 # possibilities = len(self[peer])
@@ -93,13 +94,13 @@ def solve(sudoku):
     n, cell = min((len(sudoku[cell]), cell) for cell in CELLS if
         len(sudoku[cell]) > 1)
     for guess in sudoku[cell]:
-        # print('Guessed {0} for cell {1}'.format(guess, cell))
+        debug('Guessed {0} for cell {1}'.format(guess, cell))
         guess_sudoku = deepcopy(sudoku)
         try:
             guess_sudoku.assign(cell, guess)
             guess_sudoku.eliminate()
         except SudokuContradictionError as error:
-            # print('Contradiction found: {0}'.format(error))
+            debug('Contradiction found: {0}'.format(error))
             continue
         solution = solve(guess_sudoku)
         if solution: return solution
@@ -121,13 +122,32 @@ def sudoku_from_str(sudoku_str):
 
     return sudoku
 
+def sudoku_from_input():
+    print('Please type in your sudoku.')
+    print('Use a dot for unknown cells, <Enter> at the end of a row.')
+    sudoku_str = ''.join(input().ljust(9, '.') for i in range(9))
+    return sudoku_from_str()
+
 def sudokus_from_file(filename):
-    no = 1
     with open(file=filename, mode='r') as sudoku_file:
         for line in sudoku_file:
-            print('Sudoku #{0}'.format(no))
-            yield sudoku_from_str(line.strip())
-            no += 1
+            line = line.strip()
+            if len(line) is 81: yield sudoku_from_str(line)
+
+def solve_file(filename):
+    import time
+    time_taken = []
+    unsolved = 0
+    total = 0
+    print('Solving {} ...'.format(filename))
+    for sudoku in sudokus_from_file(filename):
+        start = time.clock()
+        if solve(sudoku) is False: unsolved += 1
+        time_taken += [time.clock() - start]
+        total += 1
+    print('Solved {} of {} sudokus (avg {:.2f} secs ({:.0f} Hz), min {:.2f} secs, max {:.2f} secs)' \
+            .format(total-unsolved, total, sum(time_taken)/total,
+                total/sum(time_taken), min(time_taken), max(time_taken)))
 
 if __name__ == '__main__':
     pass
