@@ -1,6 +1,6 @@
 from copy import deepcopy
 import logging
-import time
+from time import clock
 from multiprocessing import Pool
 
 S1_STR = '...6....445....2......893..97......3.63........4..27..6.9.5.............5....3.61'
@@ -137,7 +137,7 @@ def sudokus_from_file(filename):
             if len(line) is 81: yield sudoku_from_str(line)
 
 def solve_file(filename):
-    print('Solving {} ...'.format(filename))
+    print('Solving {} (using multiprocessing) ...'.format(filename))
     pool = Pool()
     results = pool.map(solve_worker, sudokus_from_file(filename))
     total = len(results)
@@ -147,10 +147,20 @@ def solve_file(filename):
             .format(solved, total, sum(time_taken)/total, total/sum(time_taken),
                 min(time_taken), max(time_taken), sum(time_taken)))
 
+def solve_file_single(filename):
+    print('Solving {} ...'.format(filename))
+    results = [solve_worker(sudoku) for sudoku in sudokus_from_file(filename)]
+    total = len(results)
+    solved = len([result for result in results if result[0]])
+    time_taken = [t for (r, t) in results]
+    print('Solved {} of {} sudokus (avg {:.2f} secs ({:.0f} Hz), min {:.2f} secs, max {:.2f} secs, total {:.2f})' \
+            .format(solved, total, sum(time_taken)/total, total/sum(time_taken),
+                min(time_taken), max(time_taken), sum(time_taken)))
+
 def solve_worker(sudoku):
-    start = time.clock()
+    start = clock()
     result = solve(sudoku)
-    time_taken = time.clock() - start
+    time_taken = clock() - start
     return(bool(result), time_taken)
 
 if __name__ == '__main__':
