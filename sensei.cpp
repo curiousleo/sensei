@@ -1,6 +1,8 @@
 #include <vector>
 #include <set>
+#include <string>
 #include <iostream>
+#include <iomanip>
 #include <algorithm>
 
 // #include <boost/thread.hpp>
@@ -12,8 +14,79 @@ std::vector<std::vector<Position> > units;
 std::vector<std::set<Position> > peers;
 
 int main() {
+	Sudoku sudoku;
+
 	init();
+	read(sudoku);
+	display(sudoku);
+	solve(sudoku);
 	return 0;
+}
+
+void read(Sudoku& sudoku) {
+	const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	std::string s_str;
+
+	sudoku.clear();
+	// std::cin >> s_str;
+	s_str = SUDOKU1;
+
+	for (
+			std::string::const_iterator it = s_str.begin();
+			it != s_str.end(); ++it) {
+		Values values;
+
+		if ((*it) == '.' || (*it) == '0')
+			values = Values(defaults, defaults+9);
+		else {
+			Value value[] = {(Value)((*it) - '0')};
+			values = Values(value, value+1);
+		}
+		sudoku.push_back(values);
+	}
+}
+
+void display(Sudoku sudoku) {
+	// Find padding width
+	std::vector<unsigned char> lengths;
+	for (
+			Sudoku::const_iterator it = sudoku.begin();
+			it != sudoku.end(); ++it)
+		lengths.push_back((*it).size());
+	unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
+
+	// Print Sudoku
+	std::string line_sep = "\n" +
+		std::string(width*3+1, '-') + "+" +
+		std::string(width*3+1, '-') + "+" +
+		std::string(width*3, '-') + "\n";
+
+	unsigned char cell = 0;
+	for (
+			Sudoku::const_iterator it1 = sudoku.begin();
+			it1 != sudoku.end(); ++it1) {
+		std::string line;
+		for (
+				Values::const_iterator it2 = it1->begin();
+				it2 != it1->end(); ++it2) {
+			line += std::string(1, (*it2) + '0');
+		}
+		std::string sep = "";
+		if (cell % 3 == 2)
+			sep = " |";
+		if (cell % 9 == 8)
+			sep = "\n";
+		if (cell % 27 == 26)
+			sep = line_sep;
+		if (cell == 80)
+			sep = "\n";
+		std::cout << std::setw((int)width) << line << sep;
+		++cell;
+	}
+}
+
+void solve(Sudoku& sudoku) {
+	;
 }
 
 void init(void) {
@@ -64,7 +137,7 @@ void init(void) {
 				peer_set.insert(it2->begin(), it2->end());
 			}
 		}
-		peer_set.erase(pos); // pos is not a peer of pos
+		peer_set.erase(pos); // pos is not a peer of itself
 		peers.push_back(peer_set);
 	}
 }
@@ -74,13 +147,15 @@ bool solved(Sudoku sudoku) {
 			Sudoku::const_iterator it = sudoku.begin();
 			it != sudoku.end(); ++it) {
 
-		Values count; // c accumulates the total bits set in v
+		/* Values count; // c accumulates the total bits set in v
 		Values value = (*it);
 		
 		for (count = 0; value; value >>= 1) {
 			count += value & 1;
 		}
 		if (count != 1)
+			return false; */
+		if ((*it).size() != 1)
 			return false;
 	}
 	return true;
