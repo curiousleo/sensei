@@ -26,23 +26,18 @@ int main() {
 void read(Sudoku& sudoku) {
 	const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	std::string s_str;
+	Value val;
 
-	sudoku.clear();
+	sudoku = Sudoku(81, Values(defaults, defaults+9));
 	// std::cin >> s_str;
 	s_str = SUDOKU1;
 
-	for (
-			std::string::const_iterator it = s_str.begin();
-			it != s_str.end(); ++it) {
-		Values values;
-
-		if ((*it) == '.' || (*it) == '0')
-			values = Values(defaults, defaults+9);
-		else {
-			Value value[] = {(Value)((*it) - '0')};
-			values = Values(value, value+1);
-		}
-		sudoku.push_back(values);
+	for (unsigned char i = 0; i != 81; ++i) {
+		val = s_str[i];
+		if (val == '.' || val == '0')
+			continue;
+		else
+			assign(sudoku, i, (Value)(val - '0'));
 	}
 }
 
@@ -53,9 +48,9 @@ void display(Sudoku sudoku) {
 
 	// Find padding width
 	for (
-			Sudoku::const_iterator it = sudoku.begin();
-			it != sudoku.end(); ++it)
-		lengths.push_back((*it).size());
+			Sudoku::const_iterator cell_it = sudoku.begin();
+			cell_it != sudoku.end(); ++cell_it)
+		lengths.push_back((*cell_it).size());
 	const unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
 
 	// Print Sudoku
@@ -66,13 +61,13 @@ void display(Sudoku sudoku) {
 
 	cell = 0;
 	for (
-			Sudoku::const_iterator it1 = sudoku.begin();
-			it1 != sudoku.end(); ++it1) {
+			Sudoku::const_iterator cell_it = sudoku.begin();
+			cell_it != sudoku.end(); ++cell_it) {
 		line = "";
 		for (
-				Values::const_iterator it2 = it1->begin();
-				it2 != it1->end(); ++it2) {
-			line += std::string(1, (*it2) + '0');
+				Values::const_iterator value_it = cell_it->begin();
+				value_it != cell_it->end(); ++value_it) {
+			line += std::string(1, (*value_it) + '0');
 		}
 		sep = "";
 		if (cell % 3 == 2)
@@ -89,6 +84,26 @@ void display(Sudoku sudoku) {
 }
 
 void solve(Sudoku& sudoku) {
+	;
+}
+
+void assign(Sudoku& sudoku, Position pos, Value val) {
+    /* If a cell has only one possible value, then eliminate that value
+     * from the cell's peers.
+	 */
+	const Value values[] = {val};
+	sudoku[pos] = Values(values, values+1);
+	for (
+			std::set<Position>::const_iterator it = peers[pos].begin();
+			it != peers[pos].end(); ++it) {
+		sudoku[*it].erase(val);
+	}
+}
+
+bool eliminate(Sudoku& sudoku) {
+    /* If a unit has only one possible place for a value, then put the
+     * value there.
+	 */
 	;
 }
 
@@ -133,11 +148,11 @@ void init(void) {
 		// Go through all cell positions
 		std::set<Position> peer_set;
 		for (
-				std::vector<std::vector<Position> >::const_iterator it2 = units.begin();
-				it2 != units.end(); ++it2) {
+				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
+				unit_it != units.end(); ++unit_it) {
 
-			if (find(it2->begin(), it2->end(), pos) != it2->end()) {
-				peer_set.insert(it2->begin(), it2->end());
+			if (find(unit_it->begin(), unit_it->end(), pos) != unit_it->end()) {
+				peer_set.insert(unit_it->begin(), unit_it->end());
 			}
 		}
 		peer_set.erase(pos); // pos is not a peer of itself
@@ -147,18 +162,18 @@ void init(void) {
 
 bool solved(Sudoku sudoku) {
 	for (
-			Sudoku::const_iterator it = sudoku.begin();
-			it != sudoku.end(); ++it) {
+			Sudoku::const_iterator cell_it = sudoku.begin();
+			cell_it != sudoku.end(); ++cell_it) {
 
 		/* Values count; // c accumulates the total bits set in v
-		Values value = (*it);
+		Values value = (*cell_it);
 		
 		for (count = 0; value; value >>= 1) {
 			count += value & 1;
 		}
 		if (count != 1)
 			return false; */
-		if ((*it).size() != 1)
+		if ((*cell_it).size() != 1)
 			return false;
 	}
 	return true;
