@@ -47,31 +47,34 @@ void read(Sudoku& sudoku) {
 }
 
 void display(Sudoku sudoku) {
-	// Find padding width
 	std::vector<unsigned char> lengths;
+	std::string sep, line;
+	unsigned char width, cell;
+
+	// Find padding width
 	for (
 			Sudoku::const_iterator it = sudoku.begin();
 			it != sudoku.end(); ++it)
 		lengths.push_back((*it).size());
-	unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
+	width = (*max_element(lengths.begin(), lengths.end())) + 1;
 
 	// Print Sudoku
-	std::string line_sep = "\n" +
+	static const std::string line_sep = "\n" +
 		std::string(width*3+1, '-') + "+" +
 		std::string(width*3+1, '-') + "+" +
 		std::string(width*3, '-') + "\n";
 
-	unsigned char cell = 0;
+	cell = 0;
 	for (
 			Sudoku::const_iterator it1 = sudoku.begin();
 			it1 != sudoku.end(); ++it1) {
-		std::string line;
+		line = "";
 		for (
 				Values::const_iterator it2 = it1->begin();
 				it2 != it1->end(); ++it2) {
 			line += std::string(1, (*it2) + '0');
 		}
-		std::string sep = "";
+		sep = "";
 		if (cell % 3 == 2)
 			sep = " |";
 		if (cell % 9 == 8)
@@ -80,7 +83,7 @@ void display(Sudoku sudoku) {
 			sep = line_sep;
 		if (cell == 80)
 			sep = "\n";
-		std::cout << std::setw((int)width) << line << sep;
+		std::cout << std::setw(width) << line << sep;
 		++cell;
 	}
 }
