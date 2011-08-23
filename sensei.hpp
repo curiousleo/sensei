@@ -19,6 +19,6 @@ void display(Sudoku);
 void solve(Sudoku&);
 
 void assign(Sudoku&, Position, Value);
-bool eliminate(Sudoku&);
+void eliminate(Sudoku&);
 
 #endif // GUARD_sensei_h guard
