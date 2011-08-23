@@ -26,7 +26,7 @@ int main() {
 }
 
 void read(Sudoku& sudoku) {
-	const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	std::string s_str;
 	Value val;
 
@@ -93,8 +93,7 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
     /* If a cell has only one possible value, then eliminate that value
      * from the cell's peers.
 	 */
-	const Value values[] = {val};
-	sudoku[pos] = Values(values, values+1);
+	sudoku[pos] = {val};
 	for (
 			std::set<Position>::const_iterator it = peers[pos].begin();
 			it != peers[pos].end(); ++it) {
