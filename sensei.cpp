@@ -49,14 +49,14 @@ void read(Sudoku& sudoku) {
 void display(Sudoku sudoku) {
 	std::vector<unsigned char> lengths;
 	std::string sep, line;
-	unsigned char width, cell;
+	unsigned char cell;
 
 	// Find padding width
 	for (
 			Sudoku::const_iterator it = sudoku.begin();
 			it != sudoku.end(); ++it)
 		lengths.push_back((*it).size());
-	width = (*max_element(lengths.begin(), lengths.end())) + 1;
+	const unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
 
 	// Print Sudoku
 	static const std::string line_sep = "\n" +
