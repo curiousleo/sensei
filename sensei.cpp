@@ -19,6 +19,8 @@ int main() {
 	init();
 	read(sudoku);
 	display(sudoku);
+	while(eliminate(sudoku));
+	display(sudoku);
 	solve(sudoku);
 	return 0;
 }
@@ -54,7 +56,7 @@ void display(Sudoku sudoku) {
 	const unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
 
 	// Print Sudoku
-	static const std::string line_sep = "\n" +
+	const std::string line_sep = "\n" +
 		std::string(width*3+1, '-') + "+" +
 		std::string(width*3+1, '-') + "+" +
 		std::string(width*3, '-') + "\n";
@@ -77,7 +79,7 @@ void display(Sudoku sudoku) {
 		if (cell % 27 == 26)
 			sep = line_sep;
 		if (cell == 80)
-			sep = "\n";
+			sep = "\n\n";
 		std::cout << std::setw(width) << line << sep;
 		++cell;
 	}
@@ -104,12 +106,33 @@ bool eliminate(Sudoku& sudoku) {
     /* If a unit has only one possible place for a value, then put the
      * value there.
 	 */
-	;
+	bool changed = false;
+
+	for (
+			std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
+			unit_it != units.end(); ++unit_it) {
+		for (unsigned char val = 1; val != 10; ++val) {
+			std::vector<std::pair<Position, Value> > cells;
+			for (
+					std::vector<Position>::const_iterator cell_it = unit_it->begin();
+					cell_it != unit_it->end(); ++cell_it) {
+				Values* cell = &(sudoku[*cell_it]);
+				if (find(cell->begin(), cell->end(), val) != cell->end())
+					cells.push_back(std::pair<Position, Value>(*cell_it, val));
+			}
+			if (cells.size() == 1 && sudoku[cells.begin()->first].size() != 1) {
+				assign(sudoku, cells.begin()->first, cells.begin()->second);
+				changed = true;
+			}
+		}
+	}
+
+	return changed;
 }
 
 void init(void) {
 	// Fill vector 'units': rows
-	for (Position row = 0; row <= 81; row += 9) {
+	for (Position row = 0; row != 81; row += 9) {
 		// 'row': position of first cell in row
 		std::vector<Position> row_pos = {
 			(Position)row, (Position)(row+1), (Position)(row+2),
