@@ -132,39 +132,32 @@ void eliminate(Sudoku& sudoku) {
 }
 
 void init(void) {
-	// Fill vector 'units': rows
-	for (Position row = 0; row != 81; row += 9) {
+	Position row, sq_first;
+
+	// Fill vector 'units'
+	for (Position i = 0; i != 9; ++i) {
 		// 'row': position of first cell in row
-		std::vector<Position> row_pos = {
+		row = 9*i;
+		std::vector<Position> row_unit = {
 			(Position)row, (Position)(row+1), (Position)(row+2),
 			(Position)(row+3), (Position)(row+4), (Position)(row+5),
 			(Position)(row+6), (Position)(row+7), (Position)(row+8)};
-
-		units.push_back(row_pos);
-	}
+		units.push_back(row_unit);
 	
-	// Fill vector 'units': columns
-	for (Position col = 0; col != 9; ++col) {
-		// 'col' is the column index
-		std::vector<Position> col_pos = {
-			(Position)col, (Position)(col+9), (Position)(col+18),
-			(Position)(col+27), (Position)(col+36), (Position)(col+45),
-			(Position)(col+54), (Position)(col+63), (Position)(col+72)};
+		// 'i' is the column index
+		std::vector<Position> col_unit = {
+			(Position)i, (Position)(i+9), (Position)(i+18),
+			(Position)(i+27), (Position)(i+36), (Position)(i+45),
+			(Position)(i+54), (Position)(i+63), (Position)(i+72)};
+		units.push_back(col_unit);
 
-		units.push_back(col_pos);
-	}
-
-	// Fill vector 'units': 3x3 squares
-	for (Position sq = 0; sq != 9; ++sq) {
 		// Position of first (top left) cell in square
-		Position sq_first = 18 * (Position)(sq / 3) + sq * 3;
-		std::vector<Position> sq_pos = {
+		sq_first = 18 * (Position)(i / 3) + i * 3;
+		std::vector<Position> sq_unit = {
 			(Position)(sq_first), (Position)(sq_first+1), (Position)(sq_first+2),
 			(Position)(sq_first+9), (Position)(sq_first+10), (Position)(sq_first+11),
 			(Position)(sq_first+18), (Position)(sq_first+19), (Position)(sq_first+20)};
-
-		// units.insert(std::set<Position>(sq_pos.begin(), sq_pos.end()));
-		units.push_back(sq_pos);
+		units.push_back(sq_unit);
 	}
 	
 	// Fill vector 'peers'
