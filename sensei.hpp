@@ -3,14 +3,11 @@
 
 /* A Sudoku is a vector of unsigned chars (Values).
  * The vector contains the remaining possible values for the corresponding
- * square.
+ * cell.
  */
 typedef unsigned char Position;
 typedef unsigned char Values;
-typedef std::vector<Values> Sudoku;
-
-/* Vectors of positions */
-typedef std::vector<std::vector<Position> > PositionVector;
+typedef std::vector<Values, std::allocator<Position>> Sudoku;
 
 void init(void);
 
