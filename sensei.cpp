@@ -29,16 +29,23 @@ int main() {
 }
 
 Sudoku read(const std::string s_str) {
+	if (s_str.size() < 81)
+		throw std::range_error("Sudoku string too short");
+
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	Sudoku sudoku = Sudoku(81, Values(defaults, defaults+9));
 	Value val;
 
-	for (unsigned char i = 0; i != 81; ++i) {
-		val = s_str[i];
-		if (val == '.' || val == '0')
-			continue;
-		else
-			assign(sudoku, i, (Value)(val - '0'));
+	try {
+		for (unsigned char i = 0; i != 81; ++i) {
+			val = s_str[i];
+			if (val == '.' || val == '0')
+				continue;
+			else
+				assign(sudoku, i, (Value)(val - '0'));
+		}
+	} catch (std::logic_error e) {
+		std::cerr << "Error reading Sudoku: " << e.what() << std::endl;
 	}
 	return sudoku;
 }
