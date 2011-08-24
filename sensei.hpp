@@ -16,7 +16,7 @@ typedef std::vector<Values, std::allocator<Position> > Sudoku;
 void init(void);
 Sudoku read(const std::string);
 void display(const Sudoku);
-void solve(Sudoku&);
+bool solve(Sudoku&);
 
 void assign(Sudoku&, Position, Value);
 void eliminate(Sudoku&);
