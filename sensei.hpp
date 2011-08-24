@@ -14,8 +14,8 @@ typedef std::set<Value> Values;
 typedef std::vector<Values, std::allocator<Position> > Sudoku;
 
 void init(void);
-Sudoku read(std::string);
-void display(Sudoku);
+Sudoku read(const std::string);
+void display(const Sudoku);
 void solve(Sudoku&);
 
 void assign(Sudoku&, Position, Value);
