@@ -4,16 +4,13 @@ _Sensei_ is basically a C++ implementation of Peter Norvig's excellent
 [Sudoku solver](http://norvig.com/sudoku.html "Peter Norvig's Sudoku
 solver explained") (originally written in Python).
 
-The _sensei_ is **fast**: On my laptop, _sensei_ solves up to 480
-Sudokus per second.
+On my laptop, _sensei_ solves up to 480 Sudokus per second.
 
 ## Usage
 
 `sensei` reads Sudokus from the command line. The easiest way to use it
 is by piping, e.g. `cat test/top95.txt | ./bin/sensei`. Some Sudoku lists
 (also from Peter Norvig) are provided in `/test`.
-
-### Format
 
 Sudokus are saved as a flat list of cell values, 81 chars long, e.g.:
 
