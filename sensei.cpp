@@ -1,12 +1,13 @@
-#include <vector>
-#include <set>
-#include <string>
-#include <iostream>
-#include <iomanip>
 #include <algorithm>
+#include <iomanip>
+#include <iostream>
+#include <set>
+#include <stdexcept>
+#include <string>
+#include <vector>
 
-// #include <boost/thread.hpp>
 // #include <boost/foreach.hpp>
+// #include <boost/thread.hpp>
 
 #include "sensei.hpp"
 
@@ -27,7 +28,7 @@ int main() {
 	return 0;
 }
 
-Sudoku read(std::string s_str) {
+Sudoku read(const std::string s_str) {
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	Sudoku sudoku = Sudoku(81, Values(defaults, defaults+9));
 	Value val;
@@ -42,7 +43,7 @@ Sudoku read(std::string s_str) {
 	return sudoku;
 }
 
-void display(Sudoku sudoku) {
+void display(const Sudoku sudoku) {
 	std::vector<unsigned char> lengths;
 	std::string sep, line;
 	unsigned char cell;
@@ -92,11 +93,15 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
     /* If a cell has only one possible value, then eliminate that value
      * from the cell's peers.
 	 */
+	if (find(sudoku[pos].begin(), sudoku[pos].end(), val) == sudoku[pos].end())
+		throw std::range_error("Assignation not possible: value not in set of possible values");
 	sudoku[pos] = {val};
 	for (
 			std::set<Position>::const_iterator it = peers[pos].begin();
 			it != peers[pos].end(); ++it) {
 		sudoku[*it].erase(val);
+		if (sudoku[*it].size() == 0)
+			throw std::logic_error("Peer has no possibilities left");
 	}
 }
 
