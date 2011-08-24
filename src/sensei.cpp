@@ -29,9 +29,6 @@ int main() {
 }
 
 void read(Sudoku& sudoku, const std::string s_str) {
-	if (s_str.size() < 81)
-		throw std::range_error("Sudoku string too short");
-
 	// Populate new Sudoku with default values
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	sudoku = Sudoku(81, Values(defaults, defaults+9));
@@ -143,7 +140,7 @@ bool solve(Sudoku& sudoku) {
 void assign(Sudoku& sudoku, Position pos, Value val) {
     /* If a cell has only one possible value, then eliminate that value
      * from the cell's peers.
-	 */
+	  */
 	if (find(sudoku[pos].begin(), sudoku[pos].end(), val) == sudoku[pos].end())
 		throw std::range_error("Assignation not possible: value not in set of possible values");
 	if (val > 9)
@@ -163,7 +160,7 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
 void eliminate(Sudoku& sudoku) {
     /* If a unit has only one possible place for a value, then put the
      * value there.
-	 */
+	  */
 	bool changed;
 
 	do {
