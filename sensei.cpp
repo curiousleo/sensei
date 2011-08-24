@@ -24,7 +24,7 @@ int main() {
 		eliminate(sudoku);
 		display(sudoku);
 	}
-	solve(sudoku);
+	sudoku = solve(sudoku);
 	return 0;
 }
 
@@ -92,8 +92,9 @@ void display(const Sudoku sudoku) {
 	}
 }
 
-void solve(Sudoku& sudoku) {
-	;
+Sudoku solve(Sudoku sudoku) {
+	if (solved(sudoku))
+		return sudoku;
 }
 
 void assign(Sudoku& sudoku, Position pos, Value val) {
@@ -189,7 +190,7 @@ void init(void) {
 	}
 }
 
-bool solved(Sudoku sudoku) {
+bool solved(const Sudoku& sudoku) {
 	for (
 			Sudoku::const_iterator cell_it = sudoku.begin();
 			cell_it != sudoku.end(); ++cell_it) {
