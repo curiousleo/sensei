@@ -17,15 +17,19 @@ std::vector<std::set<Position> > peers;
 int main() {
 	Sudoku sudoku;
 	std::string s_str;
+	unsigned int i = 0;
 
 	init();
+
+	// Read input from pipe or terminal
 	while (std::cin >> s_str) {
+		// std::cout << ++i;
 		sudoku = read(s_str);
 		eliminate(sudoku);
-		display(sudoku);
 		solve(sudoku);
-		display(sudoku);
+		// std::cout << std::endl;
 	}
+	// std::cout << std::endl;
 	return 0;
 }
 
@@ -33,21 +37,27 @@ Sudoku read(const std::string s_str) {
 	if (s_str.size() < 81)
 		throw std::range_error("Sudoku string too short");
 
+	// Populate new Sudoku with default values
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	Sudoku sudoku = Sudoku(81, Values(defaults, defaults+9));
+
 	Value val;
 
 	try {
 		for (unsigned char i = 0; i != 81; ++i) {
 			val = s_str[i];
 			if (val == '.' || val == '0')
+				// '.' or '0' designates cell with unknown value
 				continue;
 			else
 				assign(sudoku, i, (Value)(val - '0'));
 		}
-	} catch (std::logic_error e) {
+	} catch (std::exception e) {
+		// Catch out of bounds (end of string reached)
+		// or logic error (from assignment)
 		std::cerr << "Error reading Sudoku: " << e.what() << std::endl;
 	}
+
 	return sudoku;
 }
 
@@ -94,15 +104,17 @@ void display(const Sudoku sudoku) {
 }
 
 bool solve(Sudoku& sudoku) {
+	// Check if Sudoku is already solved
 	if (solved(sudoku))
 		return true;
 
-	// Find cell with minimum possibilities
+	// Find cell with minimum possibilities > 1 so we can take a guess
 	unsigned char min_len = 10, len;
 	Position min_cell;
 
 	for (Position pos = 0; pos != 81; ++pos) {
 		len = sudoku[pos].size();
+		// Minimum length > 1 for cell is 2
 		if (len == 2) {
 			min_cell = pos;
 			break;
@@ -117,6 +129,7 @@ bool solve(Sudoku& sudoku) {
 	for (
 			Values::const_iterator guess_it = sudoku[min_cell].begin();
 			guess_it != sudoku[min_cell].end(); ++guess_it) {
+		// std::cout << ".";
 		Sudoku guess_sudoku = Sudoku(sudoku);
 		try {
 			assign(guess_sudoku, min_cell, (*guess_it));
@@ -142,7 +155,9 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
 		throw std::range_error("Assignation not possible: value not in set of possible values");
 	if (val > 9)
 		throw std::out_of_range("Value is not valid");
+
 	sudoku[pos] = {val};
+
 	for (
 			std::set<Position>::const_iterator it = peers[pos].begin();
 			it != peers[pos].end(); ++it) {
@@ -160,18 +175,24 @@ void eliminate(Sudoku& sudoku) {
 
 	do {
 		changed = false;
+
 		for (
 				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
+
 			for (unsigned char val = 1; val != 10; ++val) {
 				std::vector<std::pair<Position, Value> > cells;
+
 				for (
 						std::vector<Position>::const_iterator cell_it = unit_it->begin();
 						cell_it != unit_it->end(); ++cell_it) {
+
 					Values* cell = &(sudoku[*cell_it]);
+
 					if (find(cell->begin(), cell->end(), val) != cell->end())
 						cells.push_back(std::pair<Position, Value>(*cell_it, val));
 				}
+
 				if (cells.size() == 1 && sudoku[cells.begin()->first].size() != 1) {
 					assign(sudoku, cells.begin()->first, cells.begin()->second);
 					changed = true;
@@ -214,6 +235,7 @@ void init(void) {
 	for (Position pos = 0; pos != 81; ++pos) {
 		// Go through all cell positions
 		std::set<Position> peer_set;
+
 		for (
 				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
@@ -228,12 +250,15 @@ void init(void) {
 }
 
 bool solved(const Sudoku& sudoku) {
+	// Check if all cells have length 1
 	for (
 			Sudoku::const_iterator cell_it = sudoku.begin();
 			cell_it != sudoku.end(); ++cell_it) {
+
 		if (cell_it->size() > 1)
 			return false;
 	}
+
 	return true;
 }
 
