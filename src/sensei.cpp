@@ -14,7 +14,6 @@ std::vector<std::set<Position> > peers;
 int main() {
 	Sudoku sudoku;
 	std::string s_str;
-	unsigned int i = 0;
 
 	init();
 
