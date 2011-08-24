@@ -153,15 +153,13 @@ bool solve(Sudoku& sudoku) {
 	for (
 			Values::const_iterator guess_it = sudoku[min_cell].begin();
 			guess_it != sudoku[min_cell].end(); ++guess_it) {
-		// std::cout << ".";
 		Sudoku guess_sudoku(sudoku);
+
 		try {
 			assign(guess_sudoku, min_cell, (*guess_it));
 			eliminate(guess_sudoku);
-		} catch (std::exception e) {
-			// std::cerr << e.what();
-			continue;
-		}
+		} catch (std::exception) { continue; }
+
 		if (solve(guess_sudoku)) {
 			sudoku = guess_sudoku;
 			return true;
@@ -172,9 +170,8 @@ bool solve(Sudoku& sudoku) {
 }
 
 void assign(Sudoku& sudoku, Position pos, Value val) {
-    /* If a cell has only one possible value, then eliminate that value
-     * from the cell's peers.
-	  */
+	/* If a cell has only one possible value, then eliminate that value
+	 * from the cell's peers. */
 	if (find(sudoku[pos].begin(), sudoku[pos].end(), val) == sudoku[pos].end())
 		throw std::range_error("Assignation not possible: value not in set of possible values");
 	if (val > 9)
@@ -192,10 +189,10 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
 }
 
 void eliminate(Sudoku& sudoku) {
-    /* If a unit has only one possible place for a value, then put the
-     * value there.
-	  */
+	/* If a unit has only one possible place for a value, then put the
+	 * value there. */
 	bool changed;
+	Values* cell;
 
 	do {
 		changed = false;
@@ -211,7 +208,7 @@ void eliminate(Sudoku& sudoku) {
 						std::vector<Position>::const_iterator cell_it = unit_it->begin();
 						cell_it != unit_it->end(); ++cell_it) {
 
-					Values* cell = &(sudoku[*cell_it]);
+					cell = &(sudoku[*cell_it]);
 
 					if (find(cell->begin(), cell->end(), val) != cell->end())
 						cells.push_back(std::pair<Position, Value>(*cell_it, val));
@@ -246,7 +243,7 @@ void init(void) {
 			(Position)(i+54), (Position)(i+63), (Position)(i+72)};
 		units.push_back(col_unit);
 
-		// Position of first (top left) cell in square
+		// 'sq_first': position of first (top left) cell in square
 		sq_first = 18 * (Position)(i / 3) + i * 3;
 		std::vector<Position> sq_unit = {
 			(Position)(sq_first), (Position)(sq_first+1), (Position)(sq_first+2),
@@ -257,7 +254,6 @@ void init(void) {
 	
 	// Fill vector 'peers'
 	for (Position pos = 0; pos != 81; ++pos) {
-		// Go through all cell positions
 		std::set<Position> peer_set;
 
 		for (
@@ -274,7 +270,7 @@ void init(void) {
 }
 
 bool solved(const Sudoku& sudoku) {
-	// Check if all cells have length 1
+	// Check if all cells have length 1; no validity check
 	for (
 			Sudoku::const_iterator cell_it = sudoku.begin();
 			cell_it != sudoku.end(); ++cell_it) {
@@ -286,4 +282,4 @@ bool solved(const Sudoku& sudoku) {
 	return true;
 }
 
-// :vi: set tabstop=4 softtabstop=4 shiftwidth=4 smarttab noexpandtab :
+// vi: set tabstop=4 softtabstop=4 shiftwidth=4 smarttab noexpandtab:
