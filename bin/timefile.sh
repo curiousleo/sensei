@@ -5,7 +5,11 @@ TIMEFORMAT=%R
 for infile in "$@"
 do
 	echo -n "${infile}: "
-	TIME=$( { time ./solvefile.sh ${infile} > /dev/null; } 2>&1 )
+
+	exec 3>&1 4>&2
+   TIME=$( { time ./solvefile.sh ${infile} 1>&3 2>&4; } 2>&1 )  # Captures time only.
+   exec 3>&- 4>&-
+
 	LENGTH=$(wc -l ${infile} | cut -f1 -d' ')
 	FREQ=$(echo "scale=0; ${LENGTH} / ${TIME}" | bc -l)
 	echo "${TIME} secs (${FREQ} Hz)"
