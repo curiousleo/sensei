@@ -15,24 +15,22 @@ std::vector<std::set<Position> > peers;
 
 int main() {
 	Sudoku sudoku;
+	std::string s_str;
 
 	init();
-	read(sudoku);
-	display(sudoku);
-	eliminate(sudoku);
-	display(sudoku);
+	while (std::cin >> s_str) {
+		sudoku = read(s_str);
+		eliminate(sudoku);
+		display(sudoku);
+	}
 	solve(sudoku);
 	return 0;
 }
 
-void read(Sudoku& sudoku) {
+Sudoku read(std::string s_str) {
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	std::string s_str;
+	Sudoku sudoku = Sudoku(81, Values(defaults, defaults+9));
 	Value val;
-
-	sudoku = Sudoku(81, Values(defaults, defaults+9));
-	// std::cin >> s_str;
-	s_str = SUDOKU1;
 
 	for (unsigned char i = 0; i != 81; ++i) {
 		val = s_str[i];
@@ -41,6 +39,7 @@ void read(Sudoku& sudoku) {
 		else
 			assign(sudoku, i, (Value)(val - '0'));
 	}
+	return sudoku;
 }
 
 void display(Sudoku sudoku) {
