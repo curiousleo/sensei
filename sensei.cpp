@@ -24,7 +24,7 @@ int main() {
 		eliminate(sudoku);
 		display(sudoku);
 	}
-	sudoku = solve(sudoku);
+	solve(sudoku);
 	return 0;
 }
 
@@ -59,7 +59,7 @@ void display(const Sudoku sudoku) {
 	for (
 			Sudoku::const_iterator cell_it = sudoku.begin();
 			cell_it != sudoku.end(); ++cell_it)
-		lengths.push_back((*cell_it).size());
+		lengths.push_back(cell_it->size());
 	const unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
 
 	// Print Sudoku
@@ -92,9 +92,34 @@ void display(const Sudoku sudoku) {
 	}
 }
 
-Sudoku solve(Sudoku sudoku) {
+void solve(Sudoku& sudoku) {
 	if (solved(sudoku))
-		return sudoku;
+		return;
+
+	// Find cell with minimum possibilities
+	unsigned char min_len = 10, len;
+	Sudoku::const_iterator min_cell;
+
+	for (
+			Sudoku::const_iterator cell_it = sudoku.begin();
+			cell_it != sudoku.end(); ++cell_it) {
+		len = cell_it->size();
+		if (len == 2) {
+			min_cell = cell_it;
+			break;
+		}
+		if (len < min_len && len > 1) {
+			min_cell = cell_it;
+			min_len = len;
+		}
+	}
+
+	// Guess values for remaining possibilities
+	for (
+			Values::const_iterator guess_it = min_cell->begin();
+			guess_it != min_cell->end(); ++guess_it) {
+		;
+	}
 }
 
 void assign(Sudoku& sudoku, Position pos, Value val) {
@@ -194,16 +219,7 @@ bool solved(const Sudoku& sudoku) {
 	for (
 			Sudoku::const_iterator cell_it = sudoku.begin();
 			cell_it != sudoku.end(); ++cell_it) {
-
-		/* Values count; // c accumulates the total bits set in v
-		Values value = (*cell_it);
-		
-		for (count = 0; value; value >>= 1) {
-			count += value & 1;
-		}
-		if (count != 1)
-			return false; */
-		if ((*cell_it).size() != 1)
+		if (cell_it->size() > 1)
 			return false;
 	}
 	return true;
