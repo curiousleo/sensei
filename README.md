@@ -13,8 +13,8 @@ boost::thread library, so I recommend compiling it like this:
 
 	sensei$ g++ -std=c++0x -lboost_thread-mt -O2 -o bin/sensei src/sensei.cpp
 
-You need g++ and the boost::thread library (`libboost-thread-dev` on
-Debian).
+You need g++ and the boost::thread library (`libboost-thread-dev` Debian
+package).
 
 ## Usage
 
@@ -23,7 +23,7 @@ is by piping, e.g. `cat test/top95.txt | ./bin/sensei`. Some Sudoku lists
 (also from Peter Norvig) are provided in `/test`.
 
 Each Sudoku is represented as a flat list of cell values, 81 chars long,
-as you would read the cell values from the top left. Example:
+as you would read them from the top left. Example:
 
 	.94...13..............76..2.8..1.....32.........2...6.....5.4.......8..7..63.4..8
 
