@@ -1,3 +1,5 @@
+// Compile with: g++ -std=c++0x -O2 -lboost_thread-mt -o sensei sensei.cpp
+
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
@@ -6,26 +8,54 @@
 #include <string>
 #include <vector>
 
+#include <boost/thread.hpp>
+
 #include "sensei.hpp"
 
 std::vector<std::vector<Position> > units;
 std::vector<std::set<Position> > peers;
 
+boost::mutex cin_mutex;
+boost::shared_mutex cout_mutex;
+
 int main() {
-	Sudoku sudoku;
-	std::string s_str;
+	static const int thread_number = boost::thread::hardware_concurrency();
+	std::vector<boost::thread> threads;
 
 	init();
 
+	for (int i = 0; i != thread_number; ++i) {
+		threads.push_back(boost::thread(solve_worker));
+	}
+
+	for (
+			std::vector<boost::thread>::iterator thread_it = threads.begin();
+			thread_it != threads.end(); ++thread_it) {
+		thread_it->join();
+	}
+
+	return 0;
+}
+
+void solve_worker() {
 	// Read input from pipe or terminal
+	Sudoku sudoku;
+	std::string s_str;
+
+	cin_mutex.lock();
 	while (std::cin >> s_str) {
+		cin_mutex.unlock();
 		read(sudoku, s_str);
 		eliminate(sudoku);
 		solve(sudoku);
-		// std::cout << std::endl;
+
+		cout_mutex.lock();
+		display(sudoku);
+		cout_mutex.unlock();
+
+		cin_mutex.lock();
 	}
-	// std::cout << std::endl;
-	return 0;
+	cin_mutex.unlock();
 }
 
 void read(Sudoku& sudoku, const std::string s_str) {
@@ -120,7 +150,7 @@ bool solve(Sudoku& sudoku) {
 			Values::const_iterator guess_it = sudoku[min_cell].begin();
 			guess_it != sudoku[min_cell].end(); ++guess_it) {
 		// std::cout << ".";
-		Sudoku guess_sudoku = Sudoku(sudoku);
+		Sudoku guess_sudoku(sudoku);
 		try {
 			assign(guess_sudoku, min_cell, (*guess_it));
 			eliminate(guess_sudoku);
