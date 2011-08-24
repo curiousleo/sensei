@@ -23,8 +23,9 @@ int main() {
 		sudoku = read(s_str);
 		eliminate(sudoku);
 		display(sudoku);
+		solve(sudoku);
+		display(sudoku);
 	}
-	solve(sudoku);
 	return 0;
 }
 
@@ -92,34 +93,45 @@ void display(const Sudoku sudoku) {
 	}
 }
 
-void solve(Sudoku& sudoku) {
+bool solve(Sudoku& sudoku) {
 	if (solved(sudoku))
-		return;
+		return true;
 
 	// Find cell with minimum possibilities
 	unsigned char min_len = 10, len;
-	Sudoku::const_iterator min_cell;
+	Position min_cell;
 
-	for (
-			Sudoku::const_iterator cell_it = sudoku.begin();
-			cell_it != sudoku.end(); ++cell_it) {
-		len = cell_it->size();
+	for (Position pos = 0; pos != 81; ++pos) {
+		len = sudoku[pos].size();
 		if (len == 2) {
-			min_cell = cell_it;
+			min_cell = pos;
 			break;
 		}
 		if (len < min_len && len > 1) {
-			min_cell = cell_it;
+			min_cell = pos;
 			min_len = len;
 		}
 	}
 
 	// Guess values for remaining possibilities
 	for (
-			Values::const_iterator guess_it = min_cell->begin();
-			guess_it != min_cell->end(); ++guess_it) {
-		;
+			Values::const_iterator guess_it = sudoku[min_cell].begin();
+			guess_it != sudoku[min_cell].end(); ++guess_it) {
+		Sudoku guess_sudoku = Sudoku(sudoku);
+		try {
+			assign(guess_sudoku, min_cell, (*guess_it));
+			eliminate(guess_sudoku);
+		} catch (std::exception e) {
+			// std::cerr << e.what();
+			continue;
+		}
+		if (solve(guess_sudoku)) {
+			sudoku = guess_sudoku;
+			return true;
+		}
 	}
+
+	return false;
 }
 
 void assign(Sudoku& sudoku, Position pos, Value val) {
