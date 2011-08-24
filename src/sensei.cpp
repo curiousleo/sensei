@@ -6,9 +6,6 @@
 #include <string>
 #include <vector>
 
-// #include <boost/foreach.hpp>
-// #include <boost/thread.hpp>
-
 #include "sensei.hpp"
 
 std::vector<std::vector<Position> > units;
@@ -23,8 +20,7 @@ int main() {
 
 	// Read input from pipe or terminal
 	while (std::cin >> s_str) {
-		// std::cout << ++i;
-		sudoku = read(s_str);
+		read(sudoku, s_str);
 		eliminate(sudoku);
 		solve(sudoku);
 		// std::cout << std::endl;
@@ -33,13 +29,13 @@ int main() {
 	return 0;
 }
 
-Sudoku read(const std::string s_str) {
+void read(Sudoku& sudoku, const std::string s_str) {
 	if (s_str.size() < 81)
 		throw std::range_error("Sudoku string too short");
 
 	// Populate new Sudoku with default values
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	Sudoku sudoku = Sudoku(81, Values(defaults, defaults+9));
+	sudoku = Sudoku(81, Values(defaults, defaults+9));
 
 	Value val;
 
@@ -57,8 +53,6 @@ Sudoku read(const std::string s_str) {
 		// or logic error (from assignment)
 		std::cerr << "Error reading Sudoku: " << e.what() << std::endl;
 	}
-
-	return sudoku;
 }
 
 void display(const Sudoku sudoku) {
