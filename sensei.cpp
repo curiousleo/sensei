@@ -95,6 +95,8 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
 	 */
 	if (find(sudoku[pos].begin(), sudoku[pos].end(), val) == sudoku[pos].end())
 		throw std::range_error("Assignation not possible: value not in set of possible values");
+	if (val > 9)
+		throw std::out_of_range("Value is not valid");
 	sudoku[pos] = {val};
 	for (
 			std::set<Position>::const_iterator it = peers[pos].begin();
