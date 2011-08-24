@@ -22,12 +22,15 @@ int main() {
 	static const int thread_number = boost::thread::hardware_concurrency();
 	std::vector<boost::thread> threads;
 
+	// Initialize 'units' and 'peers' vectors
 	init();
 
+	// Create and start worker threads
 	for (int i = 0; i != thread_number; ++i) {
 		threads.push_back(boost::thread(solve_worker));
 	}
 
+	// Join worker threads
 	for (
 			std::vector<boost::thread>::iterator thread_it = threads.begin();
 			thread_it != threads.end(); ++thread_it) {
@@ -45,6 +48,7 @@ void solve_worker() {
 	cin_mutex.lock();
 	while (std::cin >> s_str) {
 		cin_mutex.unlock();
+
 		read(sudoku, s_str);
 		eliminate(sudoku);
 		solve(sudoku);
