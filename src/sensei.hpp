@@ -12,7 +12,7 @@ typedef std::set<Value> Values;
 typedef std::vector<Values, std::allocator<Position> > Sudoku;
 
 void init(void);
-Sudoku read(const std::string);
+void read(Sudoku&, const std::string);
 void display(const Sudoku);
 bool solve(Sudoku&);
 
