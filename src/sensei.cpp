@@ -85,7 +85,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 	}
 }
 
-void display(const Sudoku sudoku) {
+void display(const Sudoku& sudoku) {
 	std::vector<unsigned char> lengths;
 	std::string sep, line;
 	unsigned char cell;
