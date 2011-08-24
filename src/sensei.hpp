@@ -20,4 +20,6 @@ void assign(Sudoku&, Position, Value);
 void eliminate(Sudoku&);
 bool solved(const Sudoku&);
 
+void solve_worker(void);
+
 #endif // GUARD_sensei_h guard
