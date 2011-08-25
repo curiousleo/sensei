@@ -63,6 +63,9 @@ void solve_worker() {
 }
 
 void read(Sudoku& sudoku, const std::string s_str) {
+	if (s_str.size() < 81)
+		throw std::range_error("Sudoku string too short");
+
 	// Populate new Sudoku with default values
 	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	sudoku = Sudoku(81, Values(defaults, defaults+9));
