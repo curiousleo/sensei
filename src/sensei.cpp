@@ -1,19 +1,17 @@
 // Compile with: g++ -std=c++0x -O2 -lboost_thread-mt -o sensei sensei.cpp
 
-#include <algorithm>
-#include <iomanip>
 #include <iostream>
-#include <set>
 #include <stdexcept>
 #include <string>
-#include <vector>
 
 #include <boost/thread.hpp>
 
 #include "sensei.hpp"
 
-std::vector<std::vector<Position> > units;
-std::vector<std::set<Position> > peers;
+// 27 units, 9 cells each
+tiny[27][9] units;
+// 81 cells, 20 peer cells each
+tiny[81][20] peers;
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
