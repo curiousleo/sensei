@@ -17,7 +17,7 @@ void read(Sudoku&, const std::string);
 void display(const Sudoku&);
 bool solve(Sudoku&);
 
-void assign(Sudoku&, Position, Value);
+void assign(Sudoku&, const tiny, const tiny);
 void eliminate(Sudoku&);
 bool solved(const Sudoku&);
 
