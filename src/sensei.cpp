@@ -90,7 +90,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 
 void display(const Sudoku& sudoku) {
 	std::string sep, line;
-	tiny width, max_width;
+	tiny width, max_width = 0;
 
 	// Find padding width
 	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
@@ -98,13 +98,13 @@ void display(const Sudoku& sudoku) {
 		if (width > max_width)
 			max_width = width;
 	}
-	width = (max_width + 1) * 3;
+	width = max_width + 1;
 
 	// Print Sudoku
 	const std::string line_sep = "\n" +
-		std::string(width+1, '-') + "+" +
-		std::string(width+1, '-') + "+" +
-		std::string(width, '-') + "\n";
+		std::string(width*3+1, '-') + "+" +
+		std::string(width*3+1, '-') + "+" +
+		std::string(width*3, '-') + "\n";
 
 	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
 		line = "";
