@@ -22,6 +22,6 @@ void eliminate(Sudoku&);
 bool solved(const Sudoku&);
 
 void solve_worker(void);
-tiny count(const Sudoku&);
+tiny count(const Values&);
 
 #endif // GUARD_sensei_h guard
