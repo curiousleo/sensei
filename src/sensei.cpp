@@ -33,7 +33,7 @@ int main() {
 
 	// Join worker threads
 	for (
-			threads::iterator thread_it = threads.begin();
+			std::vector<boost::thread>::iterator thread_it = threads.begin();
 			thread_it != threads.end(); ++thread_it) {
 		thread_it->join();
 	}
@@ -72,15 +72,17 @@ void read(Sudoku& sudoku, const std::string s_str) {
 			{true, true, true, true, true, true, true, true, true};
 	sudoku.fill(defaults);
 
-	sudoku::const_iterator cell_it;
+	std::string::const_iterator cell_it;
+	tiny val;
 
 	try {
-		for (cell_it = sudoku.begin(); cell_it != sudoku.end(); ++cell_it) {
-			if ((*cell_it) == '0' || (*cell_it) == '.')
+		for (unsigned char i = 0; i != 81; ++i) {
+			val = s_str[i];
+			if (val == '.' || val == '0')
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, cell_i, (tiny)(cell_it - sudoku.begin()- '0'));
+				assign(sudoku, i, (tiny)(val - '0'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
@@ -135,31 +137,26 @@ bool solve(Sudoku& sudoku) {
 		return true;
 
 	// Find cell with minimum possibilities > 1 so we can take a guess
-	tiny min_len = 10, len;
-	Sudoku::const_iterator cell_it, min_cell_it;
-	Values::const_iterator guess_it;
+	tiny min_len = 10, len, cell_i, min_cell_i, guess_i;
 
-	for (cell_it = sudoku.begin(); cell_it != sudoku.end(); ++cell_it) {
-		len = count(*cell_it);
+	for (cell_i = 0; cell_i != 81; ++cell_i) {
+		len = count(sudoku[cell_i]);
 		// Minimum length > 1 for cell is 2
 		if (len == 2) {
-			min_cell_it = cell_it;
+			min_cell_i = cell_i;
 			break;
 		}
 		if (len < min_len && len > 1) {
-			min_cell_it = cell_it;
+			min_cell_i = cell_i;
 			min_len = len;
 		}
 	}
 
 	// Guess values for remaining possibilities
-	for (
-			guess_it = min_cell_it->begin();
-			guess_it != min_cell_it->end(); ++guess_it) {
-		if (!(*guess_it))
+	for (guess_i = 0; guess_i != 9; ++guess_i) {
+		if (!sudoku[min_cell_i][guess_i])
 			continue;
 
-		// Copy sudoku to guess_sudoku
 		Sudoku guess_sudoku = sudoku;
 
 		try {
@@ -168,9 +165,7 @@ bool solve(Sudoku& sudoku) {
 		} catch (std::exception) { continue; }
 
 		if (solve(guess_sudoku)) {
-			// Solution found; copy guess_sudoku back to sudoku
 			sudoku = guess_sudoku;
-
 			return true;
 		}
 	}
@@ -269,24 +264,40 @@ void init(void) {
 	}
 	
 	// Fill vector 'peers'
+	// std::array<std::array<tiny, 20>, 81>::const_iterator cell_it;
+	std::array<tiny, 20>::const_iterator peer_it;
+	std::array<std::array<tiny, 9>, 27>::const_iterator unit_it;
+	std::array<tiny, 9>::const_iterator unit_cell_it;
+
+	tiny cell_i, peer_count;
+
 	// Loop through cells
-	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-		tiny peer_count = 0;
+	for (cell_i = 0; cell_i != 81; ++cell_i) {
+		peer_count = 0;
 
 		// Loop through units
-		for (tiny unit_i = 0; unit_i != 27; ++unit_i) {
+		for (unit_it = units.begin(); unit_it != units.end(); ++unit_it) {
 
-			if (std::find(units[unit_i], units[unit_i] + 9, cell_i) != units[unit_i] + 9) {
-				// If cell is contained in a certain unit, add each cell in that unit as a peer
-				// if it is not yet in the list of peers
+			if (
+					std::find(unit_it->begin(), unit_it->end(), cell_i)
+							!= unit_it->end()) {
+				// If cell is contained in a certain unit, add each cell in that
+				//unit as a peer if it is not yet in the list of peers
 				
 				// Loop through through cells in unit
-				for (tiny unit_cell_i = 0; unit_cell_i != 9; ++unit_cell_i) {
+				for (
+						unit_cell_it = unit_it->begin();
+						unit_cell_it != unit_it->end(); ++unit_cell_it) {
 					
-					// If it is not yet in the list of peers and also not the cell itself, add it
-					if (std::find(peers[cell_i], peers[cell_i] + peer_count, units[unit_i][unit_cell_i]) == peers[cell_i] + peer_count &&
-							units[unit_i][unit_cell_i] != cell_i) {
-						peers[cell_i][peer_count] = units[unit_i][unit_cell_i];
+					// If it is not yet in the list of peers and also not the
+					// cell itself, add it
+					if (
+							std::find(
+									peers[cell_i].data(), peers[cell_i].data() +
+										peer_count, *unit_cell_it)
+										== peers[cell_i].data() + peer_count
+									&& *unit_cell_it != cell_i) {
+						peers[cell_i][peer_count] = *unit_cell_it;
 						++peer_count;
 					}
 				} // End loop throug cells in unit
