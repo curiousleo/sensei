@@ -269,20 +269,30 @@ void init(void) {
 	}
 	
 	// Fill vector 'peers'
-	for (Position pos = 0; pos != 81; ++pos) {
-		std::set<Position> peer_set;
+	// Loop through cells
+	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+		tiny peer_count = 0;
 
-		for (
-				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
-				unit_it != units.end(); ++unit_it) {
+		// Loop through units
+		for (tiny unit_i = 0; unit_i != 27; ++unit_i) {
 
-			if (find(unit_it->begin(), unit_it->end(), pos) != unit_it->end()) {
-				peer_set.insert(unit_it->begin(), unit_it->end());
+			if (find(units[unit_i], units[unit_i] + 9, cell_i) != units[unit_i] + 9) {
+				// If cell is contained in a certain unit, add each cell in that unit as a peer
+				// if it is not yet in the list of peers
+				
+				// Loop through through cells in unit
+				for (tiny unit_cell_i = 0; unit_cell_i != 9; ++unit_cell_i) {
+					
+					// If it is not yet in the list of peers and also not the cell itself, add it
+					if (find(peer_list, peer_list + peer_index, units[unit_i][unit_cell_i]) == peer_list + peer_index &&
+							units[unit_i][unit_cell_i] != cell_i) {
+						peers[cell_i][peer_count] = units[unit_i][unit_cell_i];
+						++peer_count;
+					}
+				} // End loop throug cells in unit
 			}
-		}
-		peer_set.erase(pos); // pos is not a peer of itself
-		peers.push_back(peer_set);
-	}
+		} // End loop through units
+	} // End loop through cells
 }
 
 bool solved(const Sudoku& sudoku) {
