@@ -9,9 +9,9 @@
 #include "sensei.hpp"
 
 // 27 units, 9 cells each
-tiny[27][9] units;
+tiny units[27][9];
 // 81 cells, 20 peer cells each
-tiny[81][20] peers;
+tiny peers[81][20];
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
