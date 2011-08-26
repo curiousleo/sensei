@@ -89,7 +89,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 
 void display(const Sudoku& sudoku) {
 	std::string sep, line;
-	tiny width = 0, max_width;
+	tiny width, max_width;
 
 	// Find padding width
 	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
@@ -196,8 +196,8 @@ void assign(Sudoku& sudoku, const tiny cell_i, const tiny val) {
 	}
 
 	for (tiny peer_i = 0; peer_i != 20; ++peer_i) {
-		sudoku[peers[peer_i]][val_i] = false;
-		if (!count(sudoku[peers[peer_i]]))
+		sudoku[peers[cell_i][peer_i]][val_i] = false;
+		if (!count(sudoku[peers[cell_i][peer_i]]))
 			throw std::logic_error("Peer has no possibilities left");
 	}
 }
