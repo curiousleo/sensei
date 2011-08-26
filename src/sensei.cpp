@@ -93,7 +93,7 @@ void display(const Sudoku& sudoku) {
 
 	// Find padding width
 	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-		width = sudoku[cell_i];
+		width = count(sudoku[cell_i]);
 		if (width > max_width)
 			max_width = width;
 	}
