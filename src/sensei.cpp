@@ -109,7 +109,7 @@ void display(const Sudoku& sudoku) {
 		line = "";
 		for (tiny val_i = 0; val_i != 9; ++val_i) {
 			if (sudoku[cell_i][val_i])
-				line += std::string(1, val_i + '0');
+				line += std::string(1, val_i + '1');
 		}
 		sep = "";
 		if (cell_i % 3 == 2)
