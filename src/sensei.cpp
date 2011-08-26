@@ -91,7 +91,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 
 void display(const Sudoku& sudoku) {
 	std::string sep, line;
-	tiny width, max_width = 0;
+	tiny cell_i, width, max_width = 0;
 	Sudoku::const_iterator cell_it;
 	Values::const_iterator val_it;
 
@@ -109,13 +109,14 @@ void display(const Sudoku& sudoku) {
 		std::string(width*3+1, '-') + "+" +
 		std::string(width*3, '-') + "\n";
 
-	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+	for (cell_it = sudoku.begin(); cell_it != sudoku.end(); ++cell_it) {
 		line = "";
-		for (tiny val_i = 0; val_i != 9; ++val_i) {
-			if (sudoku[cell_i][val_i])
-				line += std::string(1, val_i + '1');
+		for (val_it = cell_it->begin(); val_it != cell_it->end(); ++val_it) {
+			if (*val_it)
+				line += std::string(1, (char)(val_it - cell_it->begin() + '1'));
 		}
 		sep = "";
+		cell_i = cell_it - sudoku.begin();
 		if (cell_i % 3 == 2)
 			sep = " |";
 		if (cell_i % 9 == 8)
