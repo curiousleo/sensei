@@ -1,6 +1,7 @@
 // Compile with: g++ -std=c++0x -O2 -lboost_thread-mt -o sensei sensei.cpp
 
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -10,9 +11,9 @@
 #include "sensei.hpp"
 
 // 27 units, 9 cells each
-tiny units[27][9];
+std::array<std::array<tiny, 9>, 27> > units;
 // 81 cells, 20 peer cells each
-tiny peers[81][20];
+std::array<std::array<tiny, 20>, 81> > peers;
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
