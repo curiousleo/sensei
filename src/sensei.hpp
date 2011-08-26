@@ -8,7 +8,7 @@
 
 // Typedefs
 typedef unsigned char tiny;
-typedef std::array<bool, 9> Values;
+typedef std::set<tiny> Values;
 typedef std::array<Values, 81> Sudoku;
 
 // Prototypes
@@ -17,11 +17,10 @@ void read(Sudoku&, const std::string);
 void display(const Sudoku&);
 bool solve(Sudoku&);
 
-void assign(Sudoku&, Position, Value);
+void assign(Sudoku&, tiny, tiny);
 void eliminate(Sudoku&);
 bool solved(const Sudoku&);
 
 void solve_worker(void);
-tiny count(const Values&);
 
 #endif // GUARD_sensei_h guard
