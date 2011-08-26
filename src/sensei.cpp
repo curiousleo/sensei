@@ -63,19 +63,22 @@ void read(Sudoku& sudoku, const std::string s_str) {
 		throw std::range_error("Sudoku string too short");
 
 	// Populate new Sudoku with default values
-	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	sudoku = Sudoku(81, Values(defaults, defaults+9));
+	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+		for (tiny val_i = 0; val_i != 9; ++val_i) {
+			sudoku[cell_i][val_i] = true;
+		}
+	}
 
 	Value val;
 
 	try {
-		for (unsigned char i = 0; i != 81; ++i) {
-			val = s_str[i];
+		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+			val = s_str[cell_i];
 			if (val == '.' || val == '0')
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, i, (Value)(val - '0'));
+				assign(sudoku, cell_i, (Value)(val - '0'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
