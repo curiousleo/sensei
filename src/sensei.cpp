@@ -159,7 +159,7 @@ bool solve(Sudoku& sudoku) {
 		}
 
 		try {
-			assign(guess_sudoku, min_cell_i, guess_i);
+			assign(guess_sudoku, min_cell_i, guess_i + 1);
 			eliminate(guess_sudoku);
 		} catch (std::exception) { continue; }
 
