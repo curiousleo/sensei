@@ -1,5 +1,6 @@
 // Compile with: g++ -std=c++0x -O2 -lboost_thread-mt -o sensei sensei.cpp
 
+#include <algorithm>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -276,7 +277,7 @@ void init(void) {
 		// Loop through units
 		for (tiny unit_i = 0; unit_i != 27; ++unit_i) {
 
-			if (find(units[unit_i], units[unit_i] + 9, cell_i) != units[unit_i] + 9) {
+			if (std::find(units[unit_i], units[unit_i] + 9, cell_i) != units[unit_i] + 9) {
 				// If cell is contained in a certain unit, add each cell in that unit as a peer
 				// if it is not yet in the list of peers
 				
@@ -284,7 +285,7 @@ void init(void) {
 				for (tiny unit_cell_i = 0; unit_cell_i != 9; ++unit_cell_i) {
 					
 					// If it is not yet in the list of peers and also not the cell itself, add it
-					if (find(peer_list, peer_list + peer_index, units[unit_i][unit_cell_i]) == peer_list + peer_index &&
+					if (std::find(peers[cell_i], peers[cell_i] + peer_count, units[unit_i][unit_cell_i]) == peers[cell_i] + peer_count &&
 							units[unit_i][unit_cell_i] != cell_i) {
 						peers[cell_i][peer_count] = units[unit_i][unit_cell_i];
 						++peer_count;
