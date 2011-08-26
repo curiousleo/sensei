@@ -5,34 +5,37 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <boost/thread.hpp>
 
 #include "sensei.hpp"
 
 // 27 units, 9 cells each
-std::array<std::array<tiny, 9>, 27> > units;
+std::array<std::array<tiny, 9>, 27> units;
 // 81 cells, 20 peer cells each
-std::array<std::array<tiny, 20>, 81> > peers;
+std::array<std::array<tiny, 20>, 81> peers;
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
 
 int main() {
 	static const tiny thread_number = boost::thread::hardware_concurrency();
-	boost::thread threads[thread_number];
+	std::vector<boost::thread> threads;
 
 	// Initialize 'units' and 'peers' vectors
 	init();
 
 	// Create and start worker threads
 	for (tiny thread_i = 0; thread_i != thread_number; ++thread_i) {
-		threads[thread_i] = boost::thread(solve_worker);
+		threads.push_back(boost::thread(solve_worker));
 	}
 
 	// Join worker threads
-	for (tiny thread_i = 0; thread_i != thread_number; ++thread_i) {
-		threads[thread_i].join();
+	for (
+			threads::iterator thread_it = threads.begin();
+			thread_it != threads.end(); ++thread_it) {
+		thread_it->join();
 	}
 
 	return 0;
