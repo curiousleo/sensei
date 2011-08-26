@@ -72,16 +72,15 @@ void read(Sudoku& sudoku, const std::string s_str) {
 			{true, true, true, true, true, true, true, true, true};
 	sudoku.fill(defaults);
 
-	tiny val;
+	sudoku::const_iterator cell_it;
 
 	try {
-		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-			val = s_str[cell_i];
-			if (val == '0' || val == '.')
+		for (cell_it = sudoku.begin(); cell_it != sudoku.end(); ++cell_it) {
+			if ((*cell_it) == '0' || (*cell_it) == '.')
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, cell_i, (tiny)(val - '0'));
+				assign(sudoku, cell_i, (tiny)(cell_it - sudoku.begin()- '0'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
@@ -93,10 +92,12 @@ void read(Sudoku& sudoku, const std::string s_str) {
 void display(const Sudoku& sudoku) {
 	std::string sep, line;
 	tiny width, max_width = 0;
+	Sudoku::const_iterator cell_it;
+	Values::const_iterator val_it;
 
 	// Find padding width
-	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-		width = count(sudoku[cell_i]);
+	for (cell_it = sudoku.begin(); cell_it != sudoku.end(); ++cell_it) {
+		width = count(*cell_it);
 		if (width > max_width)
 			max_width = width;
 	}
