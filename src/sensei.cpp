@@ -1,6 +1,7 @@
 // Compile with: g++ -std=c++0x -O2 -lboost_thread-mt -o sensei sensei.cpp
 
 #include <algorithm>
+#include <array>
 #include <iomanip>
 #include <iostream>
 #include <set>
@@ -12,8 +13,10 @@
 
 #include "sensei.hpp"
 
-std::vector<std::vector<Position> > units;
-std::vector<std::set<Position> > peers;
+// 27 units, 9 cells each
+std::array<std::array<tiny, 9>, 27> units;
+// 81 cells, 20 peer cells each
+std::array<std::array<tiny, 20>, 81> peers;
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
@@ -67,10 +70,10 @@ void read(Sudoku& sudoku, const std::string s_str) {
 		throw std::range_error("Sudoku string too short");
 
 	// Populate new Sudoku with default values
-	static const Value defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	static const tiny defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
 	sudoku = Sudoku(81, Values(defaults, defaults+9));
 
-	Value val;
+	tiny val;
 
 	try {
 		for (unsigned char i = 0; i != 81; ++i) {
@@ -79,7 +82,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, i, (Value)(val - '0'));
+				assign(sudoku, i, (tiny)(val - '0'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
@@ -89,16 +92,16 @@ void read(Sudoku& sudoku, const std::string s_str) {
 }
 
 void display(const Sudoku& sudoku) {
-	std::vector<unsigned char> lengths;
 	std::string sep, line;
-	unsigned char cell;
+	tiny cell = 0, width, max_width = 0;
 
 	// Find padding width
-	for (
-			Sudoku::const_iterator cell_it = sudoku.begin();
-			cell_it != sudoku.end(); ++cell_it)
-		lengths.push_back(cell_it->size());
-	const unsigned char width = (*max_element(lengths.begin(), lengths.end())) + 1;
+	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+		width = count(sudoku[cell_i]);
+		if (width > max_width)
+			max_width = width;
+	}
+	width = max_width + 1;
 
 	// Print Sudoku
 	const std::string line_sep = "\n" +
@@ -106,7 +109,6 @@ void display(const Sudoku& sudoku) {
 		std::string(width*3+1, '-') + "+" +
 		std::string(width*3, '-') + "\n";
 
-	cell = 0;
 	for (
 			Sudoku::const_iterator cell_it = sudoku.begin();
 			cell_it != sudoku.end(); ++cell_it) {
@@ -137,9 +139,9 @@ bool solve(Sudoku& sudoku) {
 
 	// Find cell with minimum possibilities > 1 so we can take a guess
 	unsigned char min_len = 10, len;
-	Position min_cell;
+	tiny min_cell;
 
-	for (Position pos = 0; pos != 81; ++pos) {
+	for (tiny pos = 0; pos != 81; ++pos) {
 		len = sudoku[pos].size();
 		// Minimum length > 1 for cell is 2
 		if (len == 2) {
@@ -172,7 +174,7 @@ bool solve(Sudoku& sudoku) {
 	return false;
 }
 
-void assign(Sudoku& sudoku, Position pos, Value val) {
+void assign(Sudoku& sudoku, tiny pos, tiny val) {
 	/* If a cell has only one possible value, then eliminate that value
 	 * from the cell's peers. */
 	if (find(sudoku[pos].begin(), sudoku[pos].end(), val) == sudoku[pos].end())
@@ -183,7 +185,7 @@ void assign(Sudoku& sudoku, Position pos, Value val) {
 	sudoku[pos] = {val};
 
 	for (
-			std::set<Position>::const_iterator it = peers[pos].begin();
+			std::set<tiny>::const_iterator it = peers[pos].begin();
 			it != peers[pos].end(); ++it) {
 		sudoku[*it].erase(val);
 		if (sudoku[*it].size() == 0)
@@ -201,20 +203,20 @@ void eliminate(Sudoku& sudoku) {
 		changed = false;
 
 		for (
-				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
+				std::vector<std::vector<tiny> >::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
 
 			for (unsigned char val = 1; val != 10; ++val) {
-				std::vector<std::pair<Position, Value> > cells;
+				std::vector<std::pair<tiny, tiny> > cells;
 
 				for (
-						std::vector<Position>::const_iterator cell_it = unit_it->begin();
+						std::vector<tiny>::const_iterator cell_it = unit_it->begin();
 						cell_it != unit_it->end(); ++cell_it) {
 
 					cell = &(sudoku[*cell_it]);
 
 					if (find(cell->begin(), cell->end(), val) != cell->end())
-						cells.push_back(std::pair<Position, Value>(*cell_it, val));
+						cells.push_back(std::pair<tiny, tiny>(*cell_it, val));
 				}
 
 				if (cells.size() == 1 && sudoku[cells.begin()->first].size() != 1) {
@@ -227,40 +229,40 @@ void eliminate(Sudoku& sudoku) {
 }
 
 void init(void) {
-	Position row, sq_first;
+	tiny row, sq_first;
 
 	// Fill vector 'units'
-	for (Position i = 0; i != 9; ++i) {
+	for (tiny i = 0; i != 9; ++i) {
 		// 'row': position of first cell in row
 		row = 9*i;
-		std::vector<Position> row_unit = {
-			(Position)row, (Position)(row+1), (Position)(row+2),
-			(Position)(row+3), (Position)(row+4), (Position)(row+5),
-			(Position)(row+6), (Position)(row+7), (Position)(row+8)};
+		std::vector<tiny> row_unit = {
+			(tiny)row, (tiny)(row+1), (tiny)(row+2),
+			(tiny)(row+3), (tiny)(row+4), (tiny)(row+5),
+			(tiny)(row+6), (tiny)(row+7), (tiny)(row+8)};
 		units.push_back(row_unit);
 	
 		// 'i' is the column index
-		std::vector<Position> col_unit = {
-			(Position)i, (Position)(i+9), (Position)(i+18),
-			(Position)(i+27), (Position)(i+36), (Position)(i+45),
-			(Position)(i+54), (Position)(i+63), (Position)(i+72)};
+		std::vector<tiny> col_unit = {
+			(tiny)i, (tiny)(i+9), (tiny)(i+18),
+			(tiny)(i+27), (tiny)(i+36), (tiny)(i+45),
+			(tiny)(i+54), (tiny)(i+63), (tiny)(i+72)};
 		units.push_back(col_unit);
 
 		// 'sq_first': position of first (top left) cell in square
-		sq_first = 18 * (Position)(i / 3) + i * 3;
-		std::vector<Position> sq_unit = {
-			(Position)(sq_first), (Position)(sq_first+1), (Position)(sq_first+2),
-			(Position)(sq_first+9), (Position)(sq_first+10), (Position)(sq_first+11),
-			(Position)(sq_first+18), (Position)(sq_first+19), (Position)(sq_first+20)};
+		sq_first = 18 * (tiny)(i / 3) + i * 3;
+		std::vector<tiny> sq_unit = {
+			(tiny)(sq_first), (tiny)(sq_first+1), (tiny)(sq_first+2),
+			(tiny)(sq_first+9), (tiny)(sq_first+10), (tiny)(sq_first+11),
+			(tiny)(sq_first+18), (tiny)(sq_first+19), (tiny)(sq_first+20)};
 		units.push_back(sq_unit);
 	}
 	
 	// Fill vector 'peers'
-	for (Position pos = 0; pos != 81; ++pos) {
-		std::set<Position> peer_set;
+	for (tiny pos = 0; pos != 81; ++pos) {
+		std::set<tiny> peer_set;
 
 		for (
-				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
+				std::vector<std::vector<tiny> >::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
 
 			if (find(unit_it->begin(), unit_it->end(), pos) != unit_it->end()) {
