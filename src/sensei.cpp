@@ -16,7 +16,7 @@
 // 27 units, 9 cells each
 std::array<std::array<tiny, 9>, 27> units;
 // 81 cells, 20 peer cells each
-std::array<std::array<tiny, 20>, 81> peers;
+std::array<std::set<tiny>, 81> peers;
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
@@ -70,8 +70,8 @@ void read(Sudoku& sudoku, const std::string s_str) {
 		throw std::range_error("Sudoku string too short");
 
 	// Populate new Sudoku with default values
-	static const tiny defaults[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	sudoku = Sudoku(81, Values(defaults, defaults+9));
+	static const std::set<tiny> defaults = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+	sudoku.fill(defaults);
 
 	tiny val;
 
@@ -96,8 +96,10 @@ void display(const Sudoku& sudoku) {
 	tiny cell = 0, width, max_width = 0;
 
 	// Find padding width
-	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-		width = count(sudoku[cell_i]);
+	for (
+			Sudoku::const_iterator cell_it = sudoku.begin();
+			cell_it != sudoku.end(); ++cell_it) {
+		width = cell_it->size();
 		if (width > max_width)
 			max_width = width;
 	}
@@ -177,7 +179,7 @@ bool solve(Sudoku& sudoku) {
 void assign(Sudoku& sudoku, tiny cell_i, tiny val) {
 	/* If a cell has only one possible value, then eliminate that value
 	 * from the cell's peers. */
-	if (find(sudoku[cell_i].begin(), sudoku[cell_i].end(), val) == sudoku[cell_i].end())
+	if (std::find(sudoku[cell_i].begin(), sudoku[cell_i].end(), val) == sudoku[cell_i].end())
 		throw std::range_error("Assignation not possible: value not in set of possible values");
 	if (val > 9)
 		throw std::out_of_range("Value is not valid");
@@ -203,19 +205,19 @@ void eliminate(Sudoku& sudoku) {
 		changed = false;
 
 		for (
-				std::array<std::array<tiny> >::const_iterator unit_it = units.begin();
+				std::array<std::array<tiny, 9>, 27>::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
 
 			for (tiny val = 1; val != 10; ++val) {
-				std::array<std::pair<tiny, tiny> > cells;
+				std::vector<std::pair<tiny, tiny> > cells;
 
 				for (
-						std::array<tiny>::const_iterator cell_it = unit_it->begin();
+						std::array<tiny, 9>::const_iterator cell_it = unit_it->begin();
 						cell_it != unit_it->end(); ++cell_it) {
 
 					cell = &(sudoku[*cell_it]);
 
-					if (find(cell->begin(), cell->end(), val) != cell->end())
+					if (std::find(cell->begin(), cell->end(), val) != cell->end())
 						cells.push_back(std::pair<tiny, tiny>(*cell_it, val));
 				}
 
@@ -235,26 +237,26 @@ void init(void) {
 	for (tiny i = 0; i != 9; ++i) {
 		// 'row': position of first cell in row
 		row = 9*i;
-		std::array<tiny> row_unit = {
+		std::array<tiny, 9> row_unit = {
 			(tiny)row, (tiny)(row+1), (tiny)(row+2),
 			(tiny)(row+3), (tiny)(row+4), (tiny)(row+5),
 			(tiny)(row+6), (tiny)(row+7), (tiny)(row+8)};
-		units.push_back(row_unit);
+		units[i] = row_unit;
 	
 		// 'i' is the column index
-		std::array<tiny> col_unit = {
+		std::array<tiny, 9> col_unit = {
 			(tiny)i, (tiny)(i+9), (tiny)(i+18),
 			(tiny)(i+27), (tiny)(i+36), (tiny)(i+45),
 			(tiny)(i+54), (tiny)(i+63), (tiny)(i+72)};
-		units.push_back(col_unit);
+		units[i+9] = col_unit;
 
 		// 'sq_first': position of first (top left) cell in square
 		sq_first = 18 * (tiny)(i / 3) + i * 3;
-		std::array<tiny> sq_unit = {
+		std::array<tiny, 9> sq_unit = {
 			(tiny)(sq_first), (tiny)(sq_first+1), (tiny)(sq_first+2),
 			(tiny)(sq_first+9), (tiny)(sq_first+10), (tiny)(sq_first+11),
 			(tiny)(sq_first+18), (tiny)(sq_first+19), (tiny)(sq_first+20)};
-		units.push_back(sq_unit);
+		units[i+18] = sq_unit;
 	}
 	
 	// Fill array 'peers'
@@ -262,15 +264,15 @@ void init(void) {
 		std::set<tiny> peer_set;
 
 		for (
-				std::array<std::array<tiny> >::const_iterator unit_it = units.begin();
+				std::array<std::array<tiny, 9>, 27>::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
 
-			if (find(unit_it->begin(), unit_it->end(), cell_i) != unit_it->end()) {
+			if (std::find(unit_it->begin(), unit_it->end(), cell_i) != unit_it->end()) {
 				peer_set.insert(unit_it->begin(), unit_it->end());
 			}
 		}
 		peer_set.erase(cell_i); // pos is not a peer of itself
-		peers.push_back(peer_set);
+		peers[cell_i] = peer_set;
 	}
 }
 
