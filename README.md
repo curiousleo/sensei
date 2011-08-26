@@ -4,35 +4,37 @@
 Norvig's excellent [Sudoku solver](http://norvig.com/sudoku.html "Peter 
 Norvig's Sudoku solver explained") (originally written in Python).
 
-On my laptop, Sensei solves up to 1100 random Sudokus per second.
+On my laptop, Sensei solves up to 1400 hard (17 clues) Sudokus per second.
 
 ## Compilation
 
 The code makes use of some C++0x syntactic sugar as well as the
 boost::thread library, so I recommend compiling it like this:
 
-	sensei$ g++ -std=c++0x -lboost_thread-mt -O2 -o bin/sensei src/sensei.cpp
+	sensei$ g++ -std=c++0x -lboost_thread-mt -O3 -o bin/sensei src/sensei.cpp
 
-You need g++ and the boost::thread library (`libboost-thread-dev` Debian
-package).
+You need g++ version 4.4 and the boost::thread library (`libboost-thread-dev`
+Debian package).
 
 ## Usage
 
 Sensei reads Sudokus from the command line. The easiest way to use it
-is by piping, e.g. `cat test/top95.txt | ./bin/sensei`. Some Sudoku lists
-(also from Peter Norvig) are provided in `/test`.
+is by piping, or using the standard input.
 
 Each Sudoku is represented as a flat list of cell values, 81 chars long,
 as you would read them from the top left. Example:
 
 	.94...13..............76..2.8..1.....32.........2...6.....5.4.......8..7..63.4..8
 
-`.` stands for 'unknown value'.
+`.` or `0` stands for 'unknown value'.
 
 ## Performance
 
-The `timefile.sh` script can be run as a benchmark: `./bin/timefile.sh
-test/*`.
+The `timefile.sh` script can be run as a benchmark: `./timefile.sh
+../test/*`. I have included a list of Sudokus, `sudoku17.txt`; credits for
+this file go to [Gordon
+Royle](http://mapleta.maths.uwa.edu.au/~gordon/sudokumin.php "Gordon Royle's
+'Minimum Sudoku' website") and the University of Western Australia.
 
 ## Optimization
 
@@ -42,27 +44,19 @@ benchmark. On my laptop, the output is as follows:
 
 	sensei/bin$ ./optimize.sh 
 	Optimization -O0
-	168K    sensei
-	../test/hardest.txt: 0.067 secs (164 Hz)
-	../test/msk_009.txt: 4.763 secs (212 Hz)
-	../test/top95.txt: 0.961 secs (98 Hz)
+	112K    sensei
+	../test/sudoku17.txt: 163.099 secs (3.318 ms/puzzle, 301 Hz)
 
 	Optimization -O1
-	60K     sensei
-	../test/hardest.txt: 0.017 secs (647 Hz)
-	../test/msk_009.txt: 0.910 secs (1110 Hz)
-	../test/top95.txt: 0.190 secs (500 Hz)
+	52K     sensei
+	../test/sudoku17.txt: 35.089 secs (.713 ms/puzzle, 1400 Hz)
 
 	Optimization -O2
-	60K     sensei
-	../test/hardest.txt: 0.016 secs (687 Hz)
-	../test/msk_009.txt: 0.866 secs (1167 Hz)
-	../test/top95.txt: 0.187 secs (508 Hz)
+	52K     sensei
+	../test/sudoku17.txt: 34.411 secs (.700 ms/puzzle, 1428 Hz)
 
 	Optimization -O3
-	60K     sensei
-	../test/hardest.txt: 0.023 secs (478 Hz)
-	../test/msk_009.txt: 0.859 secs (1176 Hz)
-	../test/top95.txt: 0.186 secs (510 Hz)
+	52K     sensei
+	../test/sudoku17.txt: 33.582 secs (.683 ms/puzzle, 1463 Hz)
 
 --curiousleo
