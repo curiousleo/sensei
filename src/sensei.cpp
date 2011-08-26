@@ -259,7 +259,7 @@ void init(void) {
 	
 		// 'i' is the column index
 		for (j = 0; j != 9; ++j) {
-			units[i+9][j] = row + j*9;
+			units[i+9][j] = i + j*9;
 		}
 
 		// 'sq_first': position of first (top left) cell in square
