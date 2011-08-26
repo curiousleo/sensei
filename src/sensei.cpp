@@ -305,4 +305,13 @@ bool solved(const Sudoku& sudoku) {
 	return true;
 }
 
+tiny count(const Values& values) {
+	tiny c = 0;
+	for (tiny val_i = 0; val_i != 9; ++val_i) {
+		if (values[val_i]) c++;
+	}
+
+	return c;
+}
+
 // vi: set tabstop=4 softtabstop=4 shiftwidth=4 smarttab noexpandtab:
