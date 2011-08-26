@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <array>
-#include <iomanip>
 #include <iostream>
 #include <set>
 #include <stdexcept>
