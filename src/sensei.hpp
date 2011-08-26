@@ -7,10 +7,9 @@
  */
 
 // Typedefs
-typedef unsigned char Position;
-typedef unsigned char Value;
-typedef std::set<Value> Values;
-typedef std::vector<Values, std::allocator<Position> > Sudoku;
+typedef unsigned char tiny;
+typedef bool Values[9];
+typedef Values Sudoku[81];
 
 // Prototypes
 void init(void);
@@ -23,5 +22,6 @@ void eliminate(Sudoku&);
 bool solved(const Sudoku&);
 
 void solve_worker(void);
+tiny count(const Sudoku&);
 
 #endif // GUARD_sensei_h guard
