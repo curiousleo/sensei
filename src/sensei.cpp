@@ -205,35 +205,43 @@ void assign(Sudoku& sudoku, const tiny cell_i, const tiny val) {
 void eliminate(Sudoku& sudoku) {
 	/* If a unit has only one possible place for a value, then put the
 	 * value there. */
-	bool changed;
-	Values* cell;
+	bool changed, found;
+	tiny found_cell[2];		// Pair of (cell index, value)
 
 	do {
 		changed = false;
 
-		for (
-				std::vector<std::vector<Position> >::const_iterator unit_it = units.begin();
-				unit_it != units.end(); ++unit_it) {
+		// Loop through units
+		for (tiny unit_i = 0; unit_i != 27; ++unit_i) {
 
-			for (unsigned char val = 1; val != 10; ++val) {
-				std::vector<std::pair<Position, Value> > cells;
+			// Loop through values
+			for (tiny val_i = 0; val_i != 9; ++val_i) {
+				found = false;
 
-				for (
-						std::vector<Position>::const_iterator cell_it = unit_it->begin();
-						cell_it != unit_it->end(); ++cell_it) {
+				// Loop through cells
+				for (tiny cell_i = 0; cell_i != 9; ++cell_i) {
 
-					cell = &(sudoku[*cell_it]);
+					if (sudoku[cell_i][val_i]) {
+						if (!found) {
+							// First occurrence of this value
+							found_cell[0] = cell_i;
+							found_cell[1] = val_i + 1;
+							found = true;
+						}
+						else {
+							// Value has been found before -> not unique
+							found = false;
+							break;
+						}
+					}
+				} // End loop through cells
 
-					if (find(cell->begin(), cell->end(), val) != cell->end())
-						cells.push_back(std::pair<Position, Value>(*cell_it, val));
-				}
-
-				if (cells.size() == 1 && sudoku[cells.begin()->first].size() != 1) {
-					assign(sudoku, cells.begin()->first, cells.begin()->second);
+				if (found && count(sudoku[found_cell[0]]) != 1) {
+					assign(sudoku, found_cell[0], found_cell[1]);
 					changed = true;
 				}
-			}
-		}
+			} // End loop through values
+		} // End loop through units
 	} while (changed);
 }
 
