@@ -12,5 +12,6 @@ do
 
 	LENGTH=$(wc -l ${infile} | cut -f1 -d' ')
 	FREQ=$(echo "scale=0; ${LENGTH} / ${TIME}" | bc -l)
-	echo "${TIME} secs (${FREQ} Hz)"
+	T=$(echo "scale=3; 1000 * ${TIME} / ${LENGTH}" | bc -l)
+	echo "${TIME} secs (${T} ms/puzzle, ${FREQ} Hz)"
 done
