@@ -297,11 +297,8 @@ void init(void) {
 
 bool solved(const Sudoku& sudoku) {
 	// Check if all cells have length 1; no validity check
-	for (
-			Sudoku::const_iterator cell_it = sudoku.begin();
-			cell_it != sudoku.end(); ++cell_it) {
-
-		if (cell_it->size() > 1)
+	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+		if (count(sudoku[cell_i]) != 1)
 			return false;
 	}
 
