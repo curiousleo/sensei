@@ -22,7 +22,7 @@ Sensei reads Sudokus from the command line. The easiest way to use it
 is by piping, or using the standard input.
 
 Each Sudoku is represented as a flat list of cell values, 81 chars long,
-as you would read them from the top left. Example:
+as you would read them from the top left, row by row. Example:
 
 	.94...13..............76..2.8..1.....32.........2...6.....5.4.......8..7..63.4..8
 
