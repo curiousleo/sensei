@@ -76,13 +76,13 @@ void read(Sudoku& sudoku, const std::string s_str) {
 	tiny val;
 
 	try {
-		for (unsigned char i = 0; i != 81; ++i) {
-			val = s_str[i];
+		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+			val = s_str[cell_i];
 			if (val == '.' || val == '0')
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, i, (tiny)(val - '0'));
+				assign(sudoku, cell_i, (tiny)(val - '0'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
@@ -138,7 +138,7 @@ bool solve(Sudoku& sudoku) {
 		return true;
 
 	// Find cell with minimum possibilities > 1 so we can take a guess
-	unsigned char min_len = 10, len;
+	tiny min_len = 10, len;
 	tiny min_cell_i;
 
 	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
@@ -206,7 +206,7 @@ void eliminate(Sudoku& sudoku) {
 				std::array<std::array<tiny> >::const_iterator unit_it = units.begin();
 				unit_it != units.end(); ++unit_it) {
 
-			for (unsigned char val = 1; val != 10; ++val) {
+			for (tiny val = 1; val != 10; ++val) {
 				std::array<std::pair<tiny, tiny> > cells;
 
 				for (
