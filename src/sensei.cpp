@@ -69,7 +69,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 		}
 	}
 
-	Value val;
+	tiny val;
 
 	try {
 		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
@@ -78,7 +78,7 @@ void read(Sudoku& sudoku, const std::string s_str) {
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, cell_i, (Value)(val - '0'));
+				assign(sudoku, cell_i, (tiny)(val - '0'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
@@ -262,7 +262,7 @@ void init(void) {
 		}
 
 		// 'sq_first': position of first (top left) cell in square
-		sq_first = 18 * (Position)(i / 3) + i * 3;
+		sq_first = 18 * (tiny)(i / 3) + i * 3;
 		for (j = 0; j != 9; ++j) {
 			units[i+18][j] = sq_first + (j/3)*9 + (j%3);
 		}
