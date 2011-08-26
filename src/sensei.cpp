@@ -68,18 +68,16 @@ void read(Sudoku& sudoku, const std::string s_str) {
 		throw std::range_error("Sudoku string too short");
 
 	// Populate new Sudoku with default values
-	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-		for (tiny val_i = 0; val_i != 9; ++val_i) {
-			sudoku[cell_i][val_i] = true;
-		}
-	}
+	static const Values defaults = 
+			{true, true, true, true, true, true, true, true, true};
+	sudoku.fill(defaults);
 
 	tiny val;
 
 	try {
 		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
 			val = s_str[cell_i];
-			if (val == '.' || val == '0')
+			if (val == '0' || val == '.')
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
