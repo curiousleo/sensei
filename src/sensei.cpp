@@ -17,22 +17,20 @@ boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
 
 int main() {
-	static const int thread_number = boost::thread::hardware_concurrency();
-	std::vector<boost::thread> threads;
+	static const tiny thread_number = boost::thread::hardware_concurrency();
+	boost::thread threads[thread_number];
 
 	// Initialize 'units' and 'peers' vectors
 	init();
 
 	// Create and start worker threads
-	for (int i = 0; i != thread_number; ++i) {
-		threads.push_back(boost::thread(solve_worker));
+	for (tiny thread_i = 0; thread_i != thread_number; ++thread_i) {
+		threads[thread_i] = boost::thread(solve_worker);
 	}
 
 	// Join worker threads
-	for (
-			std::vector<boost::thread>::iterator thread_it = threads.begin();
-			thread_it != threads.end(); ++thread_it) {
-		thread_it->join();
+	for (tiny thread_i = 0; thread_i != thread_number; ++thread_i) {
+		threads[thread_i].join();
 	}
 
 	return 0;
