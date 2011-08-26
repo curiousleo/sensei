@@ -246,32 +246,26 @@ void eliminate(Sudoku& sudoku) {
 }
 
 void init(void) {
-	Position row, sq_first;
+	tiny row, sq_first, j;
 
 	// Fill vector 'units'
-	for (Position i = 0; i != 9; ++i) {
+	for (tiny i = 0; i != 9; ++i) {
 		// 'row': position of first cell in row
 		row = 9*i;
-		std::vector<Position> row_unit = {
-			(Position)row, (Position)(row+1), (Position)(row+2),
-			(Position)(row+3), (Position)(row+4), (Position)(row+5),
-			(Position)(row+6), (Position)(row+7), (Position)(row+8)};
-		units.push_back(row_unit);
+		for (j = 0; j != 9; ++j) {
+			units[i][j] = row + j;
+		}
 	
 		// 'i' is the column index
-		std::vector<Position> col_unit = {
-			(Position)i, (Position)(i+9), (Position)(i+18),
-			(Position)(i+27), (Position)(i+36), (Position)(i+45),
-			(Position)(i+54), (Position)(i+63), (Position)(i+72)};
-		units.push_back(col_unit);
+		for (j = 0; j != 9; ++j) {
+			units[i+9][j] = row + j*9;
+		}
 
 		// 'sq_first': position of first (top left) cell in square
 		sq_first = 18 * (Position)(i / 3) + i * 3;
-		std::vector<Position> sq_unit = {
-			(Position)(sq_first), (Position)(sq_first+1), (Position)(sq_first+2),
-			(Position)(sq_first+9), (Position)(sq_first+10), (Position)(sq_first+11),
-			(Position)(sq_first+18), (Position)(sq_first+19), (Position)(sq_first+20)};
-		units.push_back(sq_unit);
+		for (j = 0; j != 9; ++j) {
+			units[i+18][j] = sq_first + (j/3)*9 + (j%3);
+		}
 	}
 	
 	// Fill vector 'peers'
