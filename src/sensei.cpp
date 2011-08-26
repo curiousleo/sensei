@@ -135,33 +135,32 @@ bool solve(Sudoku& sudoku) {
 		return true;
 
 	// Find cell with minimum possibilities > 1 so we can take a guess
-	tiny min_len = 10, len, min_cell_i;
+	tiny min_len = 10, len;
+	Sudoku::const_iterator cell_it, min_cell_it;
+	Values::const_iterator guess_it;
 
-	for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
-		len = count(sudoku[cell_i]);
+	for (cell_it = sudoku.begin(); cell_it != sudoku.end(); ++cell_it) {
+		len = count(*cell_it);
 		// Minimum length > 1 for cell is 2
 		if (len == 2) {
-			min_cell_i = cell_i;
+			min_cell_it = cell_it;
 			break;
 		}
 		if (len < min_len && len > 1) {
-			min_cell_i = cell_i;
+			min_cell_it = cell_it;
 			min_len = len;
 		}
 	}
 
 	// Guess values for remaining possibilities
-	for (tiny guess_i = 0; guess_i != 9; ++guess_i) {
-		if (!sudoku[min_cell_i][guess_i])
+	for (
+			guess_it = min_cell_it->begin();
+			guess_it != min_cell_it->end(); ++guess_it) {
+		if (!(*guess_it))
 			continue;
 
 		// Copy sudoku to guess_sudoku
-		Sudoku guess_sudoku;
-		for (tiny _cell_i = 0; _cell_i != 81; ++_cell_i) {
-			for (tiny _val_i = 0; _val_i != 9; ++_val_i) {
-				guess_sudoku[_cell_i][_val_i] = sudoku[_cell_i][_val_i];
-			}
-		}
+		Sudoku guess_sudoku = sudoku;
 
 		try {
 			assign(guess_sudoku, min_cell_i, guess_i + 1);
@@ -170,11 +169,7 @@ bool solve(Sudoku& sudoku) {
 
 		if (solve(guess_sudoku)) {
 			// Solution found; copy guess_sudoku back to sudoku
-			for (tiny _cell_i = 0; _cell_i != 81; ++_cell_i) {
-				for (tiny _val_i = 0; _val_i != 9; ++_val_i) {
-					sudoku[_cell_i][_val_i] = guess_sudoku[_cell_i][_val_i];
-				}
-			}
+			sudoku = guess_sudoku;
 
 			return true;
 		}
