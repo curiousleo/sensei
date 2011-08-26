@@ -8,8 +8,8 @@
 
 // Typedefs
 typedef unsigned char tiny;
-typedef bool Values[9];
-typedef Values Sudoku[81];
+typedef std::array<bool, 9> Values;
+typedef std::array<Values, 81> Sudoku;
 
 // Prototypes
 void init(void);
