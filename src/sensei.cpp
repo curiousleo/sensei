@@ -178,21 +178,26 @@ bool solve(Sudoku& sudoku) {
 	return false;
 }
 
-void assign(Sudoku& sudoku, Position pos, Value val) {
+void assign(Sudoku& sudoku, const tiny cell_i, const tiny val) {
 	/* If a cell has only one possible value, then eliminate that value
 	 * from the cell's peers. */
-	if (find(sudoku[pos].begin(), sudoku[pos].end(), val) == sudoku[pos].end())
+	const tiny val_i = val - 1;
+
+	if (!sudoku[cell_i][val_i])
 		throw std::range_error("Assignation not possible: value not in set of possible values");
-	if (val > 9)
+	if (val_i > 9)
 		throw std::out_of_range("Value is not valid");
 
-	sudoku[pos] = {val};
+	for (tiny _val_i = 0; _val_i != 9; ++_val_i) {
+		if (_val_i == val_i)
+			sudoku[cell_i][_val_i] = true;
+		else
+			sudoku[cell_i][_val_i] = false;
+	}
 
-	for (
-			std::set<Position>::const_iterator it = peers[pos].begin();
-			it != peers[pos].end(); ++it) {
-		sudoku[*it].erase(val);
-		if (sudoku[*it].size() == 0)
+	for (tiny peer_i = 0; peer_i != 20; ++peer_i) {
+		sudoku[peers[peer_i]][val_i] = false;
+		if (!count(sudoku[peers[peer_i]]))
 			throw std::logic_error("Peer has no possibilities left");
 	}
 }
