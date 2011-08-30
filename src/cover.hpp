@@ -2,20 +2,24 @@
 #define GUARD_cover_h
 
 // Classes & Structs
+
+// Knuth: "data object x"
 struct ExactCoverNode {
 	// Members
 	ExactCoverNode *left, *right;
 	ExactCoverNode *up, *down;
 	ExactCoverNode *column;
+
+	bool value;
 };
 
-struct ExactCoverColumn {
+// Knuth: "column object"
+struct ExactCoverColumn: ExactCoverNode {
 	// Members
-	ExactCoverNode head;
     ExactCoverColumn *prev, *next;
 
-    int length;
-    int index;
+    int size;
+	std::string name;
 };
 
 class ExactCover {
@@ -24,7 +28,7 @@ public:
 	ExactCover();
 
 	// Member prototypes
-	template <class C>		// Container used to construct row
+	template <class C>
 	void add_row(const C*);
 	void cover(ExactCoverColumn*);
 	void uncover(ExactCoverColumn*);
