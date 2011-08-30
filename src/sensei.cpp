@@ -11,6 +11,7 @@
 #include <boost/thread.hpp>
 
 #include "sensei.hpp"
+#include "cover.hpp"
 
 // 27 units, 9 cells each
 std::array<std::array<tiny, 9>, 27> units;
