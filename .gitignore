@@ -1,1 +1,4 @@
+.redo
+/src/*.o
+/src/*.dep
 /bin/sensei
