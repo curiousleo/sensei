@@ -8,10 +8,11 @@ On my laptop, Sensei solves up to 1400 hard (17 clues) Sudokus per second.
 
 ## Compilation
 
-The code makes use of some C++0x syntactic sugar as well as the
-boost::thread library, so I recommend compiling it like this:
+To compile, just run
+	
+	sensei$ ./compile.sh
 
-	sensei$ g++ -std=c++0x -lboost_thread-mt -O3 -o bin/sensei src/sensei.cpp
+This will create the binary in `bin/sensei`.
 
 You need g++ version 4.4 and the boost::thread library (`libboost-thread-dev`
 Debian package).
