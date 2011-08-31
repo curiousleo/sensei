@@ -3,17 +3,32 @@
 #include "cover.hpp"
 
 ExactCover::~ExactCover() {
+	// Delete all columns from memory
 	for (
 			std::vector<ExactCoverColumn*>::iterator col_it = columns.begin();
 			col_it != columns.end(); ++col_it) {
 		delete *col_it;
 	}
 
+	// Delete all nodes from memory
 	for (
 			std::vector<ExactCoverNode*>::iterator node_it = nodes.begin();
 			node_it != nodes.end(); ++node_it) {
 		delete *node_it;
 	}
+}
+
+bool ExactCover::search() {
+	// Check if matrix is empty
+	if (root->right == root && root->down == root) {
+		return true;
+	}
+
+	// Choose column deterministically
+	ExactCoverColumn *column = smallest_column();
+	cover(column);
+
+	search();
 }
 
 void ExactCover::cover(ExactCoverColumn *column) {
