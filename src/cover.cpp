@@ -42,6 +42,30 @@ void ExactCover::cover(ExactCoverColumn *column) {
 	}
 }
 
+void ExactCover::uncover(ExactCoverColumn *column) {
+	// Re-insert column into column list
+	column->prev->next = column->next->prev = column;
+	
+	// Uncover each row this column points to
+	// Go through each row
+	for (
+			ExactCoverNode *row = column->head.down;
+			row != &(column->head); row = row->down) {
+
+		// Go through each node in that row
+		for (
+				ExactCoverNode *node = row->right;
+				node != row; node = node->right) {
+
+			// Re-insert node into column
+			node->up->down = node->down->up = node;
+
+			// Increase this node's column size
+			node->column->size++;
+		}
+	}
+}
+
 void ExactCover::add_rows(const std::vector<std::vector<bool> > *rows) {
 	std::vector<std::vector<bool> >::size_type row_i;
 
