@@ -28,6 +28,21 @@ bool ExactCover::search() {
 	ExactCoverColumn *column = smallest_column();
 	cover(column);
 
+	ExactCoverNode *node = column->head.down;
+	choice.push_back(node);
+
+	// Column empty?
+	if (node == &(column->head)) {
+		// Backup
+	}
+
+	cover_columns(node);
+
+	// Column vector empty?
+	if (columns.front()->next == columns.front()) {
+		// Solution found
+	}
+
 	search();
 }
 
