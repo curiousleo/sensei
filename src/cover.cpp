@@ -19,7 +19,7 @@ ExactCover::~ExactCover() {
 }
 
 bool ExactCover::search() {
-	// Check if matrix is empty
+	// Matrix empty?
 	if (root->right == root && root->down == root) {
 		return true;
 	}
