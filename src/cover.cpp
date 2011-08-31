@@ -2,12 +2,24 @@
 
 #include "cover.hpp"
 
-ExactCover::ExactCover() {};
+ExactCover::~ExactCover() {
+	for (
+			std::vector<ExactCoverColumn*>::iterator col_it = columns.begin();
+			col_it != columns.end(); ++col_it) {
+		delete *col_it;
+	}
+
+	for (
+			std::vector<ExactCoverNode*>::iterator node_it = nodes.begin();
+			node_it != nodes.end(); ++node_it) {
+		delete *node_it;
+	}
+}
 
 void ExactCover::add_rows(const std::vector<std::vector<bool> > *rows) {
 	std::vector<std::vector<bool> >::size_type row_i;
 
-	// Add each column
+	// Add columns
 	init_columns(rows->size());
 	
 	// Add each row
