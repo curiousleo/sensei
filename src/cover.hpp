@@ -38,9 +38,11 @@ public:
 
 private:
 	// Private prototypes
-	void add_row(const std::vector<bool> *row, int row_id);
 	void cover(ExactCoverColumn*);
 	void uncover(ExactCoverColumn*);
+
+	void add_row(const std::vector<bool> *row, int row_id);
+	void link_node(const std::vector<bool> *row, int row_id);
 
 	// Private members
 	ExactCoverNode *root, *current;
