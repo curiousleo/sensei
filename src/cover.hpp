@@ -22,18 +22,17 @@ struct ExactCoverColumn: ExactCoverNode {
     int size, index;
 };
 
-template <class C>
 class ExactCover {
 public:
 	// Constructors
 	ExactCover();
-	ExactCover(const C*);
+	ExactCover(const std::vector<std::vector<bool> > *rows);
 
 	// Destructor
 	~ExactCover();
 
 	// Public prototypes
-	void add_rows(const C*);
+	void add_rows(const std::vector<std::vector<bool> > *rows);
 	bool search();
 
 	// Public members
@@ -41,7 +40,7 @@ public:
 
 private:
 	// Private prototypes
-	void add_row(const C*);
+	void add_row(const std::vector<bool> *row, int row_id);
 	void cover(ExactCoverColumn*);
 	void uncover(ExactCoverColumn*);
 
