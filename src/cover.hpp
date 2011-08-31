@@ -3,7 +3,7 @@
 
 // Classes & Structs
 
-// Knuth: "data object x"
+// Knuth: "data object x" or node_struct
 struct ExactCoverNode {
 	// Members
 	ExactCoverNode *left, *right;
@@ -13,13 +13,13 @@ struct ExactCoverNode {
 	bool value;
 };
 
-// Knuth: "column object"
+// Knuth: "column object" or col_struct
 struct ExactCoverColumn: ExactCoverNode {
 	// Members
+	ExactCoverNode head;
     ExactCoverColumn *prev, *next;
 
-    int size;
-	std::string name;
+    int size, index;
 };
 
 class ExactCover {
@@ -27,15 +27,21 @@ public:
 	// Constructors
 	ExactCover();
 
-	// Member prototypes
-	template <class C>
-	void add_row(const C*);
+	// Public prototypes
+	template <class C1>
+	void fill(const C1*);
 	void cover(ExactCoverColumn*);
 	void uncover(ExactCoverColumn*);
 
 private:
-	// Members
+	// Private prototypes
+	template <class C2>
+	void add_row(const C2*);
+
+	// Private members
 	ExactCoverNode *root, *current;
+	std::vector<ExactCoverNode> nodes;
+	std::vector<ExactCoverColumn> columns;
 };
 
 #endif // GUARD_cover_h guard
