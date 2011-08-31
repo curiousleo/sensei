@@ -22,26 +22,35 @@ struct ExactCoverColumn: ExactCoverNode {
     int size, index;
 };
 
+template <class C>
 class ExactCover {
 public:
 	// Constructors
 	ExactCover();
+	ExactCover(const C*);
+
+	// Destructor
+	~ExactCover();
 
 	// Public prototypes
-	template <class C1>
-	void fill(const C1*);
-	void cover(ExactCoverColumn*);
-	void uncover(ExactCoverColumn*);
+	void add_rows(const C*);
+	bool search();
+
+	// Public members
+	std::vector<int> solution;
 
 private:
 	// Private prototypes
-	template <class C2>
-	void add_row(const C2*);
+	void add_row(const C*);
+	void cover(ExactCoverColumn*);
+	void uncover(ExactCoverColumn*);
 
 	// Private members
 	ExactCoverNode *root, *current;
-	std::vector<ExactCoverNode> nodes;
-	std::vector<ExactCoverColumn> columns;
+
+	std::vector<ExactCoverNode*> choice;
+	std::vector<ExactCoverNode*> nodes;
+	std::vector<ExactCoverColumn*> columns;
 };
 
 #endif // GUARD_cover_h guard
