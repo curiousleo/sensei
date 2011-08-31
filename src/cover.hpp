@@ -9,8 +9,6 @@ struct ExactCoverNode {
 	ExactCoverNode *left, *right;
 	ExactCoverNode *up, *down;
 	ExactCoverNode *column;
-
-	bool value;
 };
 
 // Knuth: "column object" or col_struct
