@@ -62,6 +62,9 @@ private:
 	std::vector<ExactCoverColumn*> columns;
 };
 
+// Enumerations
+enum SearchMode {FORWARD, ADVANCE, BACKUP, RECOVER, DONE};
+
 #endif // GUARD_cover_h guard
 
 // vi: set tabstop=4 softtabstop=4 shiftwidth=4 smarttab noexpandtab:
