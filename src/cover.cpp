@@ -3,7 +3,8 @@
 #include "cover.hpp"
 
 ExactCover::ExactCover() {
-	cur_row = cur_column = NULL;
+	cur_row = NULL;
+	cur_column = NULL;
 }
 
 ExactCover::~ExactCover() {
