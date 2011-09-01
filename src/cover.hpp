@@ -55,7 +55,8 @@ private:
 	ExactCoverColumn *smallest_column();
 
 	// Private members
-	ExactCoverNode *root, *current;
+	ExactCoverColumn *root;
+	ExactCoverNode *current;
 
 	std::vector<ExactCoverNode*> choice;
 	std::vector<ExactCoverNode*> nodes;

@@ -50,7 +50,7 @@ bool ExactCover::search() {
 void ExactCover::cover_row(ExactCoverNode *row) {
 	// Cover each column linked to this row
 	for (
-			ExactCoverColumn *node = row->right;
+			ExactCoverNode *node = row->right;
 			node != row; node = node->right) {
 		cover_column(node->column);
 	}
@@ -59,7 +59,7 @@ void ExactCover::cover_row(ExactCoverNode *row) {
 void ExactCover::uncover_row(ExactCoverNode *row) {
 	// Uncover each column linked to this row
 	for (
-			ExactCoverColumn *node = row->right;
+			ExactCoverNode *node = row->right;
 			node != row; node = node->right) {
 		uncover_column(node->column);
 	}
