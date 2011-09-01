@@ -1,6 +1,9 @@
 #ifndef GUARD_cover_h
 #define GUARD_cover_h
 
+// Enumerations
+enum SearchMode {FORWARD, ADVANCE, BACKUP, RECOVER, DONE};
+
 // Classes & Structs
 struct ExactCoverNode;
 struct ExactCoverColumn;
@@ -56,18 +59,15 @@ private:
 	void save_solution(void);
 
 	// Private members
-	ExactCoverColumn *root;
-
-	ExactCoverColumn *cur_column;
+	ExactCoverColumn *root, *cur_column;
 	ExactCoverNode *cur_row;
 
 	std::vector<ExactCoverNode*> choice;
 	std::vector<ExactCoverNode*> nodes;
 	std::vector<ExactCoverColumn*> columns;
-};
 
-// Enumerations
-enum SearchMode {FORWARD, ADVANCE, BACKUP, RECOVER, DONE};
+	SearchMode mode;
+};
 
 #endif // GUARD_cover_h guard
 
