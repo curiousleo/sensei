@@ -32,7 +32,7 @@ bool ExactCover::search() {
 				choice.push_back(cur_row);
 
 			case ADVANCE:
-				// Column empty?
+				// If all rows of cur_column have been checked, go to 'BACKUP'
 				if (cur_row == &(cur_column->head)) {
 					mode = BACKUP; break;
 				}
@@ -41,13 +41,9 @@ bool ExactCover::search() {
 
 				// Matrix empty?
 				if (root->next == root) {
-					mode = FORWARD; break;
-				}
-
-
-				// Column vector empty?
-				if (columns.front()->next == columns.front()) {
 					// Solution found
+					save_solution();
+					return true;
 				}
 
 				mode = FORWARD; break;
