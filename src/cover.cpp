@@ -2,6 +2,10 @@
 
 #include "cover.hpp"
 
+ExactCover::ExactCover() {
+	cur_row = cur_column = NULL;
+}
+
 ExactCover::~ExactCover() {
 	// Delete all columns from memory
 	for (
@@ -162,13 +166,13 @@ void ExactCover::init_columns(const int col_count) {
 
 	// Create root column
 	ExactCoverColumn *root = new ExactCoverColumn;
+	columns.push_back(root);
 	root->index = 0;
 	root->head.tag = 0;
 
-	columns.push_back(root);
-
 	for (int col_i = 0; col_i != col_count; ++col_i) {
 		ExactCoverColumn *column = new ExactCoverColumn;
+		columns.push_back(column);
 
 		column->index = col_i + 1;
 
@@ -185,8 +189,6 @@ void ExactCover::init_columns(const int col_count) {
 
 		column->prev = columns.back();
 		column->next = root;
-
-		columns.push_back(column);
 	}
 }
 
