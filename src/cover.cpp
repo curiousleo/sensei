@@ -20,12 +20,13 @@ ExactCover::~ExactCover() {
 
 bool ExactCover::search() {
 	// Matrix empty?
-	if (root->right == root && root->down == root) {
+	if (root->next == root) {
 		return true;
 	}
 
 	// Choose column deterministically
 	ExactCoverColumn *column = smallest_column();
+	cover_column(column);
 
 	// Choose row nondetermilistically
 	ExactCoverNode *row = column->head.down;
@@ -47,6 +48,7 @@ bool ExactCover::search() {
 }
 
 void ExactCover::cover_row(ExactCoverNode *row) {
+	// Cover each column linked to this row
 	for (
 			ExactCoverColumn *node = row->right;
 			node != row; node = node->right) {
@@ -55,6 +57,7 @@ void ExactCover::cover_row(ExactCoverNode *row) {
 }
 
 void ExactCover::uncover_row(ExactCoverNode *row) {
+	// Uncover each column linked to this row
 	for (
 			ExactCoverColumn *node = row->right;
 			node != row; node = node->right) {
