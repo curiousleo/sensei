@@ -96,6 +96,22 @@ void ExactCover::save_solution() {
 	}
 }
 
+ExactCoverColumn *ExactCover::smallest_column() {
+	int min_size = -1;
+	ExactCoverColumn *min_column = NULL;
+
+	for (
+			ExactCoverColumn *column = root->next;
+			column != root; column = column->next) {
+		if (min_size == -1 || column->size < min_size) {
+			min_size = column->size;
+			min_column = column;
+		}
+	}
+
+	return min_column;
+}
+
 void ExactCover::cover_row(ExactCoverNode *row) {
 	// Cover each column linked to this row
 	for (
