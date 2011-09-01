@@ -53,6 +53,7 @@ private:
 	void link_node(
 			const int row_i, const int col_i, ExactCoverNode **row_start);
 	ExactCoverColumn *smallest_column();
+	void save_solution(void);
 
 	// Private members
 	ExactCoverColumn *root;
