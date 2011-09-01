@@ -45,8 +45,8 @@ private:
 	// Private prototypes
 	void cover_row(ExactCoverNode*);
 	void cover_column(ExactCoverColumn*);
-	void uncover_row(ExactCoverColumn*);
-	void uncover_column(ExactCoverNode*);
+	void uncover_row(ExactCoverNode*);
+	void uncover_column(ExactCoverColumn*);
 
 	void add_row(const std::vector<bool> *row, const int row_id);
 	void init_columns(const int col_count);
