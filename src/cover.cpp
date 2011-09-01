@@ -46,6 +46,22 @@ bool ExactCover::search() {
 	search();
 }
 
+void ExactCover::cover_row(ExactCoverNode *row) {
+	for (
+			ExactCoverColumn *column = row->column->next;
+			column != row->column; column = column->next) {
+		cover_column(column);
+	}
+}
+
+void ExactCover::uncover_row(ExactCoverNode *row) {
+	for (
+			ExactCoverColumn *column = row->column->next;
+			column != row->column; column = column->next) {
+		uncover_column(column);
+	}
+}
+
 void ExactCover::cover_column(ExactCoverColumn *column) {
 	// Unlink column from the column list
 	column->prev->next = column->next;
@@ -72,7 +88,7 @@ void ExactCover::cover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::uncover(ExactCoverColumn *column) {
+void ExactCover::uncover_column(ExactCoverColumn *column) {
 	// Re-insert column into column list
 	column->prev->next = column->next->prev = column;
 	
