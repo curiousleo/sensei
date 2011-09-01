@@ -7,7 +7,21 @@ ExactCover::ExactCover() {
 	cur_column = NULL;
 }
 
+ExactCover::ExactCover(
+		const std::vector<std::vector<bool> > *rows,
+		const std::vector<int> *tags) {
+	cur_row = NULL;
+	cur_column = NULL;
+
+	set_rows(rows);
+	assign_tags(tags);
+}
+
 ExactCover::~ExactCover() {
+	free_memory();
+}
+
+void ExactCover::free_memory() {
 	// Delete all columns from memory
 	for (
 			std::vector<ExactCoverColumn*>::iterator col_it = columns.begin();
@@ -83,6 +97,10 @@ bool ExactCover::search() {
 				return false;
 		}
 	}
+}
+
+void ExactCover::assign_tags(const std::vector<int> *tags) {
+	;
 }
 
 void ExactCover::save_solution() {
@@ -180,8 +198,12 @@ void ExactCover::uncover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::add_rows(const std::vector<std::vector<bool> > *rows) {
+void ExactCover::set_rows(const std::vector<std::vector<bool> > *rows) {
 	std::vector<std::vector<bool> >::size_type row_i;
+
+	// Clear columns & rows
+	free_memory();
+	choice.clear(); nodes.clear(); columns.clear();
 
 	// Add columns
 	init_columns(rows->size());
