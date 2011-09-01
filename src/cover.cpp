@@ -19,15 +19,10 @@ ExactCover::~ExactCover() {
 }
 
 bool ExactCover::search() {
-	SearchMode mode = ADVANCE;
+	SearchMode mode = FORWARD;
 	while (true) {
 		switch (mode) {
-			case ADVANCE:
-				// Matrix empty?
-				if (root->next == root) {
-					return true;
-				}
-
+			case FORWARD:
 				// Choose column deterministically
 				cur_column = smallest_column();
 				cover_column(cur_column);
@@ -36,23 +31,51 @@ bool ExactCover::search() {
 				cur_row = cur_column->head.down;
 				choice.push_back(cur_row);
 
-			case FORWARD:
+			case ADVANCE:
 				// Column empty?
 				if (cur_row == &(cur_column->head)) {
-					// Backup
+					mode = BACKUP; break;
 				}
 
 				cover_row(cur_row);
+
+				// Matrix empty?
+				if (root->next == root) {
+					mode = FORWARD; break;
+				}
+
 
 				// Column vector empty?
 				if (columns.front()->next == columns.front()) {
 					// Solution found
 				}
 
+				mode = FORWARD; break;
+
 			case BACKUP:
+				// Undo 'FORWARD'
+				uncover_column(cur_column);
+
+				if (choice.size() == 1) {
+					mode = DONE; break;
+				}
+
+				cur_row = choice.back();
+				cur_column = cur_row->column;
+
 			case RECOVER:
+				// Undo 'ADVANCE'
+				uncover_row(cur_row);
+
+				choice.pop_back();
+
+				cur_row = cur_row->down;
+				choice.push_back(cur_row);
+				
+				mode = ADVANCE; break;
+
 			case DONE:
-				;
+				return false;
 		}
 	}
 }
