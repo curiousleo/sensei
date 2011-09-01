@@ -43,13 +43,14 @@ public:
 
 private:
 	// Private prototypes
-	void cover(ExactCoverColumn*);
-	void uncover(ExactCoverColumn*);
+	void cover_row(ExactCoverNode*);
+	void cover_column(ExactCoverColumn*);
+	void uncover_row(ExactCoverColumn*);
+	void uncover_column(ExactCoverNode*);
 
 	void add_row(const std::vector<bool> *row, const int row_id);
 	void init_columns(const int col_count);
 	void link_node(const int row_i, const int col_i, ExactCoverNode **row_start);
-	void cover_columns(ExactCoverNode *node);
 	ExactCoverColumn *smallest_column();
 
 	// Private members
