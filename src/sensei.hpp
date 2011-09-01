@@ -17,10 +17,6 @@ void read(Sudoku&, const std::string);
 void display(const Sudoku&);
 bool solve(Sudoku&);
 
-void assign(Sudoku&, tiny, tiny);
-void eliminate(Sudoku&);
-bool solved(const Sudoku&);
-
 void solve_worker(void);
 
 #endif // GUARD_sensei_h guard
