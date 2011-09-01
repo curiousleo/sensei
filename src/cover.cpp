@@ -19,32 +19,42 @@ ExactCover::~ExactCover() {
 }
 
 bool ExactCover::search() {
-	// Matrix empty?
-	if (root->next == root) {
-		return true;
+	SearchMode mode = ADVANCE;
+	while (true) {
+		switch (mode) {
+			case ADVANCE:
+				// Matrix empty?
+				if (root->next == root) {
+					return true;
+				}
+
+				// Choose column deterministically
+				cur_column = smallest_column();
+				cover_column(cur_column);
+
+				// Choose row nondetermilistically
+				cur_row = cur_column->head.down;
+				choice.push_back(cur_row);
+
+			case FORWARD:
+				// Column empty?
+				if (cur_row == &(cur_column->head)) {
+					// Backup
+				}
+
+				cover_row(cur_row);
+
+				// Column vector empty?
+				if (columns.front()->next == columns.front()) {
+					// Solution found
+				}
+
+			case BACKUP:
+			case RECOVER:
+			case DONE:
+				;
+		}
 	}
-
-	// Choose column deterministically
-	ExactCoverColumn *column = smallest_column();
-	cover_column(column);
-
-	// Choose row nondetermilistically
-	ExactCoverNode *row = column->head.down;
-	choice.push_back(row);
-
-	// Column empty?
-	if (row == &(column->head)) {
-		// Backup
-	}
-
-	cover_row(row);
-
-	// Column vector empty?
-	if (columns.front()->next == columns.front()) {
-		// Solution found
-	}
-
-	search();
 }
 
 void ExactCover::cover_row(ExactCoverNode *row) {
