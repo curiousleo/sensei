@@ -32,13 +32,16 @@ class ExactCover {
 public:
 	// Constructors
 	ExactCover();
-	ExactCover(const std::vector<std::vector<bool> > *rows);
+	ExactCover(
+			const std::vector<std::vector<bool> > *rows,
+			const std::vector<int> *tags);
 
 	// Destructor
 	~ExactCover();
 
 	// Public prototypes
-	void add_rows(const std::vector<std::vector<bool> > *rows);
+	void set_rows(const std::vector<std::vector<bool> > *rows);
+	void assign_tags(const std::vector<int> *tags);
 	bool search();
 
 	// Public members
@@ -57,6 +60,7 @@ private:
 			const int row_i, const int col_i, ExactCoverNode **row_start);
 	ExactCoverColumn *smallest_column();
 	void save_solution(void);
+	void free_memory();
 
 	// Private members
 	ExactCoverColumn *root, *cur_column;
