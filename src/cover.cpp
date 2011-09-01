@@ -76,8 +76,20 @@ bool ExactCover::search() {
 				mode = ADVANCE; continue;
 
 			case DONE:
+				// No solution found
 				return false;
 		}
+	}
+}
+
+void ExactCover::save_solution() {
+	solution.clear();
+
+	// For each node in 'choice', save its tag in 'solution'
+	for (
+			std::vector<ExactCoverNode*>::const_iterator node_it =
+			choice.begin(); node_it != choice.end(); ++node_it) {
+		solution.push_back((*node_it)->tag);
 	}
 }
 
