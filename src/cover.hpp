@@ -50,7 +50,8 @@ private:
 
 	void add_row(const std::vector<bool> *row, const int row_id);
 	void init_columns(const int col_count);
-	void link_node(const int row_i, const int col_i, ExactCoverNode **row_start);
+	void link_node(
+			const int row_i, const int col_i, ExactCoverNode **row_start);
 	ExactCoverColumn *smallest_column();
 
 	// Private members
