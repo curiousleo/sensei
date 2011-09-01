@@ -48,17 +48,17 @@ bool ExactCover::search() {
 
 void ExactCover::cover_row(ExactCoverNode *row) {
 	for (
-			ExactCoverColumn *column = row->column->next;
-			column != row->column; column = column->next) {
-		cover_column(column);
+			ExactCoverColumn *node = row->right;
+			node != row; node = node->right) {
+		cover_column(node->column);
 	}
 }
 
 void ExactCover::uncover_row(ExactCoverNode *row) {
 	for (
-			ExactCoverColumn *column = row->column->next;
-			column != row->column; column = column->next) {
-		uncover_column(column);
+			ExactCoverColumn *node = row->right;
+			node != row; node = node->right) {
+		uncover_column(node->column);
 	}
 }
 
