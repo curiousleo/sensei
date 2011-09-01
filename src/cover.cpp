@@ -24,7 +24,10 @@ ExactCover::~ExactCover() {
 }
 
 bool ExactCover::search() {
-	SearchMode mode = FORWARD;
+	// If search has been called before, try to find next solution
+	if (cur_row == NULL && cur_column == NULL) mode = RECOVER;
+	else mode = FORWARD;
+
 	while (true) {
 		switch (mode) {
 			case FORWARD:
