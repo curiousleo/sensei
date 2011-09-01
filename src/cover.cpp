@@ -26,17 +26,17 @@ bool ExactCover::search() {
 
 	// Choose column deterministically
 	ExactCoverColumn *column = smallest_column();
-	cover(column);
 
-	ExactCoverNode *node = column->head.down;
-	choice.push_back(node);
+	// Choose row nondetermilistically
+	ExactCoverNode *row = column->head.down;
+	choice.push_back(row);
 
 	// Column empty?
-	if (node == &(column->head)) {
+	if (row == &(column->head)) {
 		// Backup
 	}
 
-	cover_columns(node);
+	cover_row(row);
 
 	// Column vector empty?
 	if (columns.front()->next == columns.front()) {
