@@ -46,7 +46,7 @@ bool ExactCover::search() {
 	search();
 }
 
-void ExactCover::cover(ExactCoverColumn *column) {
+void ExactCover::cover_column(ExactCoverColumn *column) {
 	// Unlink column from the column list
 	column->prev->next = column->next;
 	column->next->prev = column->prev;
