@@ -39,7 +39,7 @@ bool ExactCover::search() {
 			case ADVANCE:
 				// If all rows of cur_column have been checked, go to 'BACKUP'
 				if (cur_row == &(cur_column->head)) {
-					mode = BACKUP; break;
+					mode = BACKUP; continue;
 				}
 
 				cover_row(cur_row);
@@ -51,14 +51,14 @@ bool ExactCover::search() {
 					return true;
 				}
 
-				mode = FORWARD; break;
+				mode = FORWARD; continue;
 
 			case BACKUP:
 				// Undo 'FORWARD'
 				uncover_column(cur_column);
 
 				if (choice.size() == 1) {
-					mode = DONE; break;
+					mode = DONE; continue;
 				}
 
 				cur_row = choice.back();
@@ -73,7 +73,7 @@ bool ExactCover::search() {
 				cur_row = cur_row->down;
 				choice.push_back(cur_row);
 				
-				mode = ADVANCE; break;
+				mode = ADVANCE; continue;
 
 			case DONE:
 				return false;
