@@ -3,14 +3,14 @@
 #include "cover.hpp"
 
 ExactCover::ExactCover() {
-	cur_row = NULL;
+	cur_node = NULL;
 	cur_column = NULL;
 }
 
 ExactCover::ExactCover(
 		const std::vector<std::vector<bool> > *rows,
 		const std::vector<int> *tags) {
-	cur_row = NULL;
+	cur_node = NULL;
 	cur_column = NULL;
 
 	set_rows(rows);
@@ -39,7 +39,7 @@ void ExactCover::free_memory() {
 
 bool ExactCover::search() {
 	// If search has been called before, try to find next solution
-	if (cur_row == NULL && cur_column == NULL) mode = RECOVER;
+	if (cur_node == NULL && cur_column == NULL) mode = RECOVER;
 	else mode = FORWARD;
 
 	while (true) {
@@ -50,16 +50,16 @@ bool ExactCover::search() {
 				cover_column(cur_column);
 
 				// Choose row nondetermilistically
-				cur_row = cur_column->head.down;
-				choice.push_back(cur_row);
+				cur_node = cur_column->head.down;
+				choice.push_back(cur_node);
 
 			case ADVANCE:
 				// If all rows of cur_column have been checked, go to 'BACKUP'
-				if (cur_row == &(cur_column->head)) {
+				if (cur_node == &(cur_column->head)) {
 					mode = BACKUP; continue;
 				}
 
-				cover_row(cur_row);
+				cover_row(cur_node);
 
 				// Matrix empty?
 				if (root->next == root) {
@@ -78,17 +78,17 @@ bool ExactCover::search() {
 					mode = DONE; continue;
 				}
 
-				cur_row = choice.back();
-				cur_column = cur_row->column;
+				cur_node = choice.back();
+				cur_column = cur_node->column;
 
 			case RECOVER:
 				// Undo 'ADVANCE'
-				uncover_row(cur_row);
+				uncover_row(cur_node);
 
 				choice.pop_back();
 
-				cur_row = cur_row->down;
-				choice.push_back(cur_row);
+				cur_node = cur_node->down;
+				choice.push_back(cur_node);
 				
 				mode = ADVANCE; continue;
 
