@@ -1,5 +1,3 @@
-// Compile with: g++ -std=c++0x -O2 -lboost_thread-mt -o sensei sensei.cpp
-
 #include <algorithm>
 #include <array>
 #include <iostream>
