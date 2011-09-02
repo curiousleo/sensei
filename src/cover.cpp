@@ -8,7 +8,7 @@ ExactCover::ExactCover() {
 }
 
 ExactCover::ExactCover(
-		const std::vector<std::vector<bool> > *rows,
+		const std::vector<std::vector<int> > *rows,
 		const std::vector<int> *tags) {
 	cur_node = NULL;
 	cur_column = NULL;
@@ -198,15 +198,28 @@ void ExactCover::uncover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::set_rows(const std::vector<std::vector<bool> > *rows) {
-	std::vector<std::vector<bool> >::size_type row_i;
+void ExactCover::set_rows(const std::vector<std::vector<int> > *rows) {
+	std::vector<std::vector<int> >::size_type row_i;
 
 	// Clear columns & rows
 	free_memory();
 	choice.clear(); nodes.clear(); columns.clear();
 
-	// Add columns
-	init_columns(rows->size());
+	int max_column = 0;
+
+	// Find number of columns
+	for (
+			std::vector<std::vector<int> >::const_iterator row_it =
+			rows->begin(); row_it != rows->end(); ++row_it) {
+		for (
+				std::vector<int>::const_iterator node_it =
+				row_it->begin(); node_it != row_it->end(); ++node_it) {
+			if (*node_it > max_column) max_column = *node_it;
+		}
+	}
+
+	// Initialize columns
+	init_columns(max_column);
 	
 	// Add each row
 	for (row_i = 0; row_i != rows->size(); ++row_i) {
@@ -246,19 +259,20 @@ void ExactCover::init_columns(const int col_count) {
 	}
 }
 
-void ExactCover::add_row(const std::vector<bool> *row, const int row_i) {
-	std::vector<bool>::size_type col_i;
+void ExactCover::add_row(
+		const std::vector<int> *row, const int row_i) {
 	ExactCoverNode *row_start = NULL;
 
 	// Add each element (node)
-	for (col_i = 0; col_i != row->size(); ++col_i) {
-		if ((*row)[col_i]) {
-			link_node(row_i, col_i, &row_start);
-		}
+	for (
+			std::vector<int>::const_iterator node_it = row->begin();
+			node_it != row->end(); ++node_it) {
+		link_node(row_i, *node_it, &row_start);
 	}
 }
 
-void ExactCover::link_node(const int row_i, const int col_i, ExactCoverNode **row_start) {
+void ExactCover::link_node(
+		const int row_i, const int col_i, ExactCoverNode **row_start) {
 	// Goal: Populate all node members: left, right, up, down, column, tag
 	
 	ExactCoverNode *node = new ExactCoverNode;
