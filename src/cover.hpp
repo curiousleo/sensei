@@ -32,15 +32,15 @@ class ExactCover {
 public:
 	// Constructors
 	ExactCover();
-	ExactCover(
-			const std::vector<std::vector<bool> > *rows,
+	ExactCover(		// From LIL sparse matrix
+			const std::vector<std::vector<int> > *rows,
 			const std::vector<int> *tags);
 
 	// Destructor
 	~ExactCover();
 
 	// Public prototypes
-	void set_rows(const std::vector<std::vector<bool> > *rows);
+	void set_rows(const std::vector<std::vector<int> > *rows);
 	void assign_tags(const std::vector<int> *tags);
 	bool search();
 
@@ -54,10 +54,9 @@ private:
 	void uncover_row(ExactCoverNode*);
 	void uncover_column(ExactCoverColumn*);
 
-	void add_row(const std::vector<bool> *row, const int row_id);
+	void add_row(const std::vector<int> *row, const int row_id);
 	void init_columns(const int col_count);
-	void link_node(
-			const int row_i, const int col_i, ExactCoverNode **row_start);
+	void link_node(const int row_i, const int col_i, ExactCoverNode **row_start);
 	ExactCoverColumn *smallest_column();
 	void save_solution(void);
 	void free_memory();
