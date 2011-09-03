@@ -6,34 +6,35 @@
 #include <string>
 #include <vector>
 
-#include <boost/thread.hpp>
+// #include <boost/thread.hpp>
 
 #include "cover.hpp"
 #include "sensei.hpp"
 
 Sudoku default_sudoku;
 
-boost::mutex cin_mutex;
-boost::shared_mutex cout_mutex;
+// boost::mutex cin_mutex;
+// boost::shared_mutex cout_mutex;
 
 int main() {
-	static const int thread_number = boost::thread::hardware_concurrency();
-	std::vector<boost::thread> threads;
+	// static const int thread_number = boost::thread::hardware_concurrency();
+	// std::vector<boost::thread> threads;
 
 	// Initialize 'sudoku_matrix'
 	init();
 
 	// Create and start worker threads
-	for (int i = 0; i != thread_number; ++i) {
-		threads.push_back(boost::thread(solve_worker));
-	}
+	// for (int i = 0; i != thread_number; ++i) {
+		// threads.push_back(boost::thread(solve_worker));
+	// }
 
 	// Join worker threads
-	for (
-			std::vector<boost::thread>::iterator thread_it = threads.begin();
-			thread_it != threads.end(); ++thread_it) {
-		thread_it->join();
-	}
+	// for (
+			// std::vector<boost::thread>::iterator thread_it = threads.begin();
+			// thread_it != threads.end(); ++thread_it) {
+		// thread_it->join();
+	// }
+	solve_worker();
 
 	return 0;
 }
@@ -44,20 +45,20 @@ void solve_worker() {
 	Solution solution;
 	std::string s_str;
 
-	cin_mutex.lock();
+	// cin_mutex.lock();
 	while (std::cin >> s_str) {
-		cin_mutex.unlock();
+		// cin_mutex.unlock();
 
 		read(sudoku, s_str);
 		solution = solve(sudoku);
 
-		cout_mutex.lock();
+		// cout_mutex.lock();
 		display(solution);
-		cout_mutex.unlock();
+		// cout_mutex.unlock();
 
-		cin_mutex.lock();
+		// cin_mutex.lock();
 	}
-	cin_mutex.unlock();
+	// cin_mutex.unlock();
 }
 
 void read(Sudoku& sudoku, const std::string s_str) {
