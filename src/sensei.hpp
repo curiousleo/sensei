@@ -6,10 +6,20 @@
  * cell.
  */
 
+// Definitions
+#define N 9
+#define NN N*N
+
+// Macros
+#define BOX(cell_i)						((cell_i) % 27) * 3 + ((cell_i) % 9) / 3
+#define ROW(cell_i, val_i)				       N * ((val_i)) + (cell_i)
+
+#define ROW_COND(cell_i, val_i) 		NN +   N * ((val_i)) + ((cell_i) / 9)
+#define COLUMN_COND(cell_i, val_i)	2*NN + N * ((val_i)) + ((cell_i) % 9)
+#define BOX_COND(cell_i, val_i) 		3*NN + N * ((val_i)) + BOX(cell_i)
+
 // Typedefs
-typedef unsigned char tiny;
-typedef std::set<tiny> Values;
-typedef std::array<Values, 81> Sudoku;
+typedef std::list<std::list<int> > Sudoku;
 
 // Prototypes
 void init(void);
@@ -17,6 +27,7 @@ void read(Sudoku&, const std::string);
 void display(const Sudoku&);
 bool solve(Sudoku&);
 
+void assign(Sudoku&, const int, const int);
 void solve_worker(void);
 
 #endif // GUARD_sensei_h guard
