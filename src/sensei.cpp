@@ -132,7 +132,7 @@ void display(Solution& solution) {
 }
 
 Solution solve(const Sudoku& sudoku) {
-	ExactCover cover = ExactCover(sudoku&);
+	ExactCover cover(&sudoku);
 	cover.search();
 	return cover.solution;
 }
