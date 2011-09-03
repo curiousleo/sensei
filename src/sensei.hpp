@@ -25,7 +25,7 @@ typedef std::vector<int> Solution;
 // Prototypes
 void init(void);
 void read(Sudoku&, const std::string);
-void display(const Solution&);
+void display(Solution&);
 Solution solve(const Sudoku&);
 
 void assign(Sudoku&, const int, const int);
