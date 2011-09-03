@@ -1,3 +1,4 @@
+#include <list>
 #include <vector>
 
 #include "cover.hpp"
@@ -7,9 +8,7 @@ ExactCover::ExactCover() {
 	cur_column = NULL;
 }
 
-ExactCover::ExactCover(
-		const std::vector<std::vector<int> > *rows,
-		const std::vector<int> *tags) {
+ExactCover::ExactCover(const std::list<std::list<int> > *rows) {
 	cur_node = NULL;
 	cur_column = NULL;
 
@@ -193,8 +192,8 @@ void ExactCover::uncover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::set_rows(const std::vector<std::vector<int> > *rows) {
-	std::vector<std::vector<int> >::size_type row_i;
+void ExactCover::set_rows(const std::list<std::list<int> > *rows) {
+	std::list<std::list<int> >::const_iterator row_it;
 
 	// Clear columns & rows
 	free_memory();
@@ -203,11 +202,9 @@ void ExactCover::set_rows(const std::vector<std::vector<int> > *rows) {
 	int max_column = 0;
 
 	// Find number of columns
-	for (
-			std::vector<std::vector<int> >::const_iterator row_it =
-			rows->begin(); row_it != rows->end(); ++row_it) {
+	for (row_it = rows->begin(); row_it != rows->end(); ++row_it) {
 		for (
-				std::vector<int>::const_iterator node_it =
+				std::list<int>::const_iterator node_it =
 				row_it->begin(); node_it != row_it->end(); ++node_it) {
 			if (*node_it > max_column) max_column = *node_it;
 		}
@@ -217,8 +214,10 @@ void ExactCover::set_rows(const std::vector<std::vector<int> > *rows) {
 	init_columns(max_column);
 	
 	// Add each row
-	for (row_i = 0; row_i != rows->size(); ++row_i) {
-		add_row(&(*rows)[row_i], row_i);
+	int row_i = 0;
+	for (row_it = rows->begin(); row_it != rows->end(); ++row_it) {
+		add_row(&(*row_it), row_i);
+		++row_i;
 	}
 }
 
@@ -254,12 +253,12 @@ void ExactCover::init_columns(const int col_count) {
 	}
 }
 
-void ExactCover::add_row(const std::vector<int> *row, const int row_i) {
+void ExactCover::add_row(const std::list<int> *row, const int row_i) {
 	ExactCoverNode *row_start = NULL;
 
 	// Add each element (node)
 	for (
-			std::vector<int>::const_iterator node_it = row->begin();
+			std::list<int>::const_iterator node_it = row->begin();
 			node_it != row->end(); ++node_it) {
 		link_node(row_i, *node_it, &row_start);
 	}
