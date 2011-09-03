@@ -20,12 +20,13 @@
 
 // Typedefs
 typedef std::list<std::list<int> > Sudoku;
+typedef std::vector<int> Solution;
 
 // Prototypes
 void init(void);
 void read(Sudoku&, const std::string);
-void display(const Sudoku&);
-bool solve(Sudoku&);
+void display(const Solution&);
+Solution solve(const Sudoku&);
 
 void assign(Sudoku&, const int, const int);
 void solve_worker(void);

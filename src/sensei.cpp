@@ -41,6 +41,7 @@ int main() {
 void solve_worker() {
 	// Read input from pipe or terminal
 	Sudoku sudoku(default_sudoku);
+	Solution solution;
 	std::string s_str;
 
 	cin_mutex.lock();
@@ -48,10 +49,10 @@ void solve_worker() {
 		cin_mutex.unlock();
 
 		read(sudoku, s_str);
-		solve(sudoku);
+		solution = solve(sudoku);
 
 		cout_mutex.lock();
-		display(sudoku);
+		display(solution);
 		cout_mutex.unlock();
 
 		cin_mutex.lock();
