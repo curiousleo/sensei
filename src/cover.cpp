@@ -14,7 +14,6 @@ ExactCover::ExactCover(
 	cur_column = NULL;
 
 	set_rows(rows);
-	assign_tags(tags);
 }
 
 ExactCover::~ExactCover() {
@@ -97,10 +96,6 @@ bool ExactCover::search() {
 				return false;
 		}
 	}
-}
-
-void ExactCover::assign_tags(const std::vector<int> *tags) {
-	;
 }
 
 void ExactCover::save_solution() {
@@ -259,8 +254,7 @@ void ExactCover::init_columns(const int col_count) {
 	}
 }
 
-void ExactCover::add_row(
-		const std::vector<int> *row, const int row_i) {
+void ExactCover::add_row(const std::vector<int> *row, const int row_i) {
 	ExactCoverNode *row_start = NULL;
 
 	// Add each element (node)

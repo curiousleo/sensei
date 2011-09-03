@@ -41,7 +41,6 @@ public:
 
 	// Public prototypes
 	void set_rows(const std::vector<std::vector<int> > *rows);
-	void assign_tags(const std::vector<int> *tags);
 	bool search();
 
 	// Public members
