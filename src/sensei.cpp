@@ -8,8 +8,10 @@
 
 #include <boost/thread.hpp>
 
-#include "sensei.hpp"
 #include "cover.hpp"
+#include "sensei.hpp"
+
+Sudoku default_sudoku;
 
 boost::mutex cin_mutex;
 boost::shared_mutex cout_mutex;
@@ -18,7 +20,7 @@ int main() {
 	static const int thread_number = boost::thread::hardware_concurrency();
 	std::vector<boost::thread> threads;
 
-	// Initialize 'units' and 'peers' vectors
+	// Initialize 'sudoku_matrix'
 	init();
 
 	// Create and start worker threads
@@ -38,7 +40,7 @@ int main() {
 
 void solve_worker() {
 	// Read input from pipe or terminal
-	Sudoku sudoku;
+	Sudoku sudoku(default_sudoku);
 	std::string s_str;
 
 	cin_mutex.lock();
@@ -61,20 +63,16 @@ void read(Sudoku& sudoku, const std::string s_str) {
 	if (s_str.size() < 81)
 		throw std::range_error("Sudoku string too short");
 
-	// Populate new Sudoku with default values
-	static const std::set<tiny> defaults = {1, 2, 3, 4, 5, 6, 7, 8, 9};
-	sudoku.fill(defaults);
-
-	tiny val;
+	int val;
 
 	try {
-		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
+		for (int cell_i = 0; cell_i != 81; ++cell_i) {
 			val = s_str[cell_i];
 			if (val == '.' || val == '0')
 				// '.' or '0' designates cell with unknown value
 				continue;
 			else
-				assign(sudoku, cell_i, (tiny)(val - '0'));
+				assign(sudoku, cell_i, (int)(val - '1'));
 		}
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
@@ -83,9 +81,28 @@ void read(Sudoku& sudoku, const std::string s_str) {
 	}
 }
 
+void assign(Sudoku& sudoku, const int cell_i, const int val_i) {
+	// Erase corresponding 'symbol@position' row
+	Sudoku::iterator row_it = sudoku.begin();
+	advance(row_it, ROW(cell_i, val_i));
+	sudoku.erase(row_it);
+
+	// Erase all condition columns whose conditions are fulfilled
+	for (row_it = sudoku.begin(); row_it != sudoku.end(); ++row_it) {
+		// Location condition
+		row_it->remove(cell_i);
+		// Row condition
+		row_it->remove(ROW_COND(cell_i, val_i));
+		// Column condition
+		row_it->remove(COLUMN_COND(cell_i, val_i));
+		// Box condition
+		row_it->remove(BOX_COND(cell_i, val_i));
+	}
+}
+
 void display(const Sudoku& sudoku) {
 	std::string sep, line;
-	tiny cell = 0, width, max_width = 0;
+	int cell = 0, width, max_width = 0;
 
 	// Find padding width
 	for (
@@ -108,7 +125,7 @@ void display(const Sudoku& sudoku) {
 			cell_it != sudoku.end(); ++cell_it) {
 		line = "";
 		for (
-				Values::const_iterator value_it = cell_it->begin();
+				std::list<int>::const_iterator value_it = cell_it->begin();
 				value_it != cell_it->end(); ++value_it) {
 			line += std::string(1, (*value_it) + '0');
 		}
