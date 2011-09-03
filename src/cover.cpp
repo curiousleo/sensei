@@ -8,7 +8,7 @@ ExactCover::ExactCover() {
 	cur_column = NULL;
 }
 
-ExactCover::ExactCover(const std::list<std::list<int> > *rows) {
+ExactCover::ExactCover(const std::list<std::list<int> > &rows) {
 	cur_node = NULL;
 	cur_column = NULL;
 
@@ -45,7 +45,7 @@ bool ExactCover::search() {
 			case FORWARD:
 				// Choose column deterministically
 				cur_column = smallest_column();
-				cover_column(cur_column);
+				cover_column(*cur_column);
 
 				// Choose row nondetermilistically
 				cur_node = cur_column->head.down;
@@ -57,7 +57,7 @@ bool ExactCover::search() {
 					mode = BACKUP; continue;
 				}
 
-				cover_row(cur_node);
+				cover_row(*cur_node);
 
 				// Matrix empty?
 				if (root->next == root) {
@@ -70,7 +70,7 @@ bool ExactCover::search() {
 
 			case BACKUP:
 				// Undo 'FORWARD'
-				uncover_column(cur_column);
+				uncover_column(*cur_column);
 
 				if (choice.size() == 1) {
 					mode = DONE; continue;
@@ -81,7 +81,7 @@ bool ExactCover::search() {
 
 			case RECOVER:
 				// Undo 'ADVANCE'
-				uncover_row(cur_node);
+				uncover_row(*cur_node);
 
 				choice.pop_back();
 
@@ -124,34 +124,34 @@ ExactCoverColumn *ExactCover::smallest_column() {
 	return min_column;
 }
 
-void ExactCover::cover_row(ExactCoverNode *row) {
+void ExactCover::cover_row(ExactCoverNode &row) {
 	// Cover each column linked to this row
 	for (
-			ExactCoverNode *node = row->right;
-			node != row; node = node->right) {
-		cover_column(node->column);
+			ExactCoverNode *node = row.right;
+			node != &row; node = node->right) {
+		cover_column(*(node->column));
 	}
 }
 
-void ExactCover::uncover_row(ExactCoverNode *row) {
+void ExactCover::uncover_row(ExactCoverNode &row) {
 	// Uncover each column linked to this row
 	for (
-			ExactCoverNode *node = row->right;
-			node != row; node = node->right) {
-		uncover_column(node->column);
+			ExactCoverNode *node = row.right;
+			node != &row; node = node->right) {
+		uncover_column(*(node->column));
 	}
 }
 
-void ExactCover::cover_column(ExactCoverColumn *column) {
+void ExactCover::cover_column(ExactCoverColumn &column) {
 	// Unlink column from the column list
-	column->prev->next = column->next;
-	column->next->prev = column->prev;
+	column.prev->next = column.next;
+	column.next->prev = column.prev;
 
 	// Cover each row this column points to
 	// Go through each row
 	for (
-			ExactCoverNode *row = column->head.down;
-			row != &(column->head); row = row->down) {
+			ExactCoverNode *row = column.head.down;
+			row != &(column.head); row = row->down) {
 
 		// Go through each node in that row
 		for (
@@ -168,15 +168,15 @@ void ExactCover::cover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::uncover_column(ExactCoverColumn *column) {
+void ExactCover::uncover_column(ExactCoverColumn &column) {
 	// Re-insert column into column list
-	column->prev->next = column->next->prev = column;
+	column.prev->next = column.next->prev = &column;
 	
 	// Uncover each row this column points to
 	// Go through each row
 	for (
-			ExactCoverNode *row = column->head.down;
-			row != &(column->head); row = row->down) {
+			ExactCoverNode *row = column.head.down;
+			row != &(column.head); row = row->down) {
 
 		// Go through each node in that row
 		for (
@@ -192,7 +192,7 @@ void ExactCover::uncover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::set_rows(const std::list<std::list<int> > *rows) {
+void ExactCover::set_rows(const std::list<std::list<int> > &rows) {
 	std::list<std::list<int> >::const_iterator row_it;
 
 	// Clear columns & rows
@@ -202,7 +202,7 @@ void ExactCover::set_rows(const std::list<std::list<int> > *rows) {
 	int max_column = 0;
 
 	// Find number of columns
-	for (row_it = rows->begin(); row_it != rows->end(); ++row_it) {
+	for (row_it = rows.begin(); row_it != rows.end(); ++row_it) {
 		for (
 				std::list<int>::const_iterator node_it =
 				row_it->begin(); node_it != row_it->end(); ++node_it) {
@@ -215,8 +215,8 @@ void ExactCover::set_rows(const std::list<std::list<int> > *rows) {
 	
 	// Add each row
 	int row_i = 0;
-	for (row_it = rows->begin(); row_it != rows->end(); ++row_it) {
-		add_row(&(*row_it), row_i);
+	for (row_it = rows.begin(); row_it != rows.end(); ++row_it) {
+		add_row((*row_it), row_i);
 		++row_i;
 	}
 }
@@ -253,13 +253,13 @@ void ExactCover::init_columns(const int col_count) {
 	}
 }
 
-void ExactCover::add_row(const std::list<int> *row, const int row_i) {
+void ExactCover::add_row(const std::list<int> &row, const int row_i) {
 	ExactCoverNode *row_start = NULL;
 
 	// Add each element (node)
 	for (
-			std::list<int>::const_iterator node_it = row->begin();
-			node_it != row->end(); ++node_it) {
+			std::list<int>::const_iterator node_it = row.begin();
+			node_it != row.end(); ++node_it) {
 		link_node(row_i, *node_it, &row_start);
 	}
 }
