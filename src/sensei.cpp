@@ -101,35 +101,22 @@ void assign(Sudoku& sudoku, const int cell_i, const int val_i) {
 	}
 }
 
-void display(const Sudoku& sudoku) {
+void display(Solution& solution) {
 	std::string sep, line;
 	int cell = 0, width, max_width = 0;
 
-	// Find padding width
-	for (
-			Sudoku::const_iterator cell_it = sudoku.begin();
-			cell_it != sudoku.end(); ++cell_it) {
-		width = cell_it->size();
-		if (width > max_width)
-			max_width = width;
-	}
-	width = max_width + 1;
+	sort(solution.begin(), solution.end());
 
-	// Print Sudoku
+	// Print Solution
 	const std::string line_sep = "\n" +
-		std::string(width*3+1, '-') + "+" +
-		std::string(width*3+1, '-') + "+" +
-		std::string(width*3, '-') + "\n";
+		std::string(4, '-') + "+" +
+		std::string(4, '-') + "+" +
+		std::string(3, '-') + "\n";
 
 	for (
-			Sudoku::const_iterator cell_it = sudoku.begin();
-			cell_it != sudoku.end(); ++cell_it) {
-		line = "";
-		for (
-				std::list<int>::const_iterator value_it = cell_it->begin();
-				value_it != cell_it->end(); ++value_it) {
-			line += std::string(1, (*value_it) + '0');
-		}
+			Solution::const_iterator tag_it = solution.begin();
+			tag_it != solution.end(); ++tag_it) {
+		line = std::string(1, (*tag_it) % 9 + 1);
 		sep = "";
 		if (cell % 3 == 2)
 			sep = " |";
