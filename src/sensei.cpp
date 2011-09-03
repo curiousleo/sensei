@@ -138,7 +138,18 @@ Solution solve(const Sudoku& sudoku) {
 }
 
 void init(void) {
-	;
+	int cell_i, val_i;
+
+	// Initialize default_sudoku (sparse matrix)
+	for (int row_i = 0; row_i != NN*N; ++row_i) {
+		cell_i = row_i % N;
+		val_i = row_i / N;
+
+		default_sudoku.push_back(std::list<int>
+				{ROW_COND(cell_i, val_i),
+				COLUMN_COND(cell_i, val_i),
+				BOX_COND(cell_i, val_i)});
+	}
 }
 
 // vi: set tabstop=4 softtabstop=4 shiftwidth=4 smarttab noexpandtab:
