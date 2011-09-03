@@ -144,8 +144,10 @@ void display(const Sudoku& sudoku) {
 	}
 }
 
-bool solve(Sudoku& sudoku) {
-	;
+Solution solve(const Sudoku& sudoku) {
+	ExactCover cover = ExactCover(sudoku&);
+	cover.search();
+	return cover.solution;
 }
 
 void init(void) {
