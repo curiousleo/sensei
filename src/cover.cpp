@@ -37,15 +37,15 @@ void ExactCover::free_memory() {
 
 bool ExactCover::search() {
 	// If search has been called before, try to find next solution
-	if (cur_node == NULL && cur_column == NULL) mode = RECOVER;
-	else mode = FORWARD;
+	if (cur_node == NULL && cur_column == NULL) mode = FORWARD;
+	else mode = RECOVER;
 
 	while (true) {
 		switch (mode) {
 			case FORWARD:
 				// Choose column deterministically
 				cur_column = smallest_column();
-				cover_column(*cur_column);
+				cover_column(cur_column);
 
 				// Choose row nondetermilistically
 				cur_node = cur_column->head.down;
@@ -57,7 +57,7 @@ bool ExactCover::search() {
 					mode = BACKUP; continue;
 				}
 
-				cover_row(*cur_node);
+				cover_row(cur_node);
 
 				// Matrix empty?
 				if (root->next == root) {
@@ -70,7 +70,7 @@ bool ExactCover::search() {
 
 			case BACKUP:
 				// Undo 'FORWARD'
-				uncover_column(*cur_column);
+				uncover_column(cur_column);
 
 				if (choice.size() == 1) {
 					mode = DONE; continue;
@@ -81,7 +81,7 @@ bool ExactCover::search() {
 
 			case RECOVER:
 				// Undo 'ADVANCE'
-				uncover_row(*cur_node);
+				uncover_row(cur_node);
 
 				choice.pop_back();
 
@@ -124,34 +124,34 @@ ExactCoverColumn *ExactCover::smallest_column() {
 	return min_column;
 }
 
-void ExactCover::cover_row(ExactCoverNode row) {
+void ExactCover::cover_row(ExactCoverNode *row) {
 	// Cover each column linked to this row
 	for (
-			ExactCoverNode *node = row.right;
-			node != &row; node = node->right) {
-		cover_column(*(node->column));
+			ExactCoverNode *node = row->right;
+			node != row; node = node->right) {
+		cover_column(node->column);
 	}
 }
 
-void ExactCover::uncover_row(ExactCoverNode row) {
+void ExactCover::uncover_row(ExactCoverNode *row) {
 	// Uncover each column linked to this row
 	for (
-			ExactCoverNode *node = row.right;
-			node != &row; node = node->right) {
-		uncover_column(*(node->column));
+			ExactCoverNode *node = row->right;
+			node != row; node = node->right) {
+		uncover_column(node->column);
 	}
 }
 
-void ExactCover::cover_column(ExactCoverColumn column) {
+void ExactCover::cover_column(ExactCoverColumn *column) {
 	// Unlink column from the column list
-	column.prev->next = column.next;
-	column.next->prev = column.prev;
+	column->prev->next = column->next;
+	column->next->prev = column->prev;
 
 	// Cover each row this column points to
 	// Go through each row
 	for (
-			ExactCoverNode *row = column.head.down;
-			row != &(column.head); row = row->down) {
+			ExactCoverNode *row = column->head.down;
+			row != &(column->head); row = row->down) {
 
 		// Go through each node in that row
 		for (
@@ -168,15 +168,15 @@ void ExactCover::cover_column(ExactCoverColumn column) {
 	}
 }
 
-void ExactCover::uncover_column(ExactCoverColumn column) {
+void ExactCover::uncover_column(ExactCoverColumn *column) {
 	// Re-insert column into column list
-	column.prev->next = column.next->prev = &column;
+	column->prev->next = column->next->prev = column;
 	
 	// Uncover each row this column points to
 	// Go through each row
 	for (
-			ExactCoverNode *row = column.head.down;
-			row != &(column.head); row = row->down) {
+			ExactCoverNode *row = column->head.down;
+			row != &(column->head); row = row->down) {
 
 		// Go through each node in that row
 		for (
@@ -226,14 +226,13 @@ void ExactCover::init_columns(const int col_count) {
 	columns.reserve(col_count + 1);
 
 	// Create root column
-	ExactCoverColumn *root = new ExactCoverColumn;
+	root = new ExactCoverColumn;
 	columns.push_back(root);
 	root->index = 0;
 	root->head.tag = 0;
 
 	for (int col_i = 0; col_i != col_count; ++col_i) {
 		ExactCoverColumn *column = new ExactCoverColumn;
-		columns.push_back(column);
 
 		column->index = col_i + 1;
 
@@ -250,6 +249,8 @@ void ExactCover::init_columns(const int col_count) {
 
 		column->prev = columns.back();
 		column->next = root;
+
+		columns.push_back(column);
 	}
 }
 
