@@ -11,7 +11,7 @@
 #define NN N*N
 
 // Macros
-#define BOX(cell_i)						((cell_i) % 27) * 3 + ((cell_i) % 9) / 3
+#define BOX(cell_i)						((cell_i) / 27) * 3 + ((cell_i) % 9) / 3
 #define ROW(cell_i, val_i)				       N * (cell_i) * (val_i)
 
 #define ROW_COND(cell_i, val_i) 		NN +   N * ((val_i)) + ((cell_i) / 9)
