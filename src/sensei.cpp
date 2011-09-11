@@ -143,11 +143,12 @@ void init(void) {
 
 	// Initialize default_sudoku (sparse matrix)
 	for (int row_i = 0; row_i != NN*N; ++row_i) {
-		cell_i = row_i % N;
-		val_i = row_i / N;
+		cell_i = row_i / N;
+		val_i = row_i % N;
 
-		default_sudoku.push_back(std::list<int>
-				{ROW_COND(cell_i, val_i),
+		default_sudoku.push_back(std::list<int> {
+				cell_i,
+				ROW_COND(cell_i, val_i),
 				COLUMN_COND(cell_i, val_i),
 				BOX_COND(cell_i, val_i)});
 	}
