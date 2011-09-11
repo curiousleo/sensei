@@ -53,7 +53,7 @@ void solve_worker() {
 		solution = solve(sudoku);
 
 		// cout_mutex.lock();
-		display(solution);
+		// display(solution);
 		// cout_mutex.unlock();
 
 		// cin_mutex.lock();
@@ -104,7 +104,7 @@ void assign(Sudoku& sudoku, const int cell_i, const int val_i) {
 
 void display(Solution& solution) {
 	std::string sep, line;
-	int cell = 0, width, max_width = 0;
+	int cell = 0;
 
 	sort(solution.begin(), solution.end());
 
@@ -127,15 +127,15 @@ void display(Solution& solution) {
 			sep = line_sep;
 		if (cell == 80)
 			sep = "\n\n";
-		std::cout << std::setw(width) << line << sep;
+		std::cout << std::setw(1) << line << sep;
 		++cell;
 	}
 }
 
 Solution solve(const Sudoku& sudoku) {
 	ExactCover cover(sudoku);
-	cover.search();
-	return cover.solution;
+	if (cover.search()) return cover.solution;
+	else std::cerr << "No solution found" << std::endl;
 }
 
 void init(void) {
