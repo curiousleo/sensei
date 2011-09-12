@@ -276,24 +276,24 @@ void ExactCover::link_node(
 
 	// Populate tag and column fields
 	node->tag = row_i;
-	node->column = columns[col_i];
+	node->column = columns[col_i + 1]; // col_i starts with zero; columns[0] is root
 
 	// Set row_start to node if row is the first node in that column
 	if (*row_start == NULL) *row_start = node;
 
 	// Populate down field
-	node->down = &(columns[col_i]->head);
-	columns[col_i]->head.up = node;
+	node->down = &(node->column->head);
+	node->column->head.up = node;
 
 	// Populate up field
 	// Is node the only element in that column?
-	if (columns[col_i]->size == 0) {
-		node->up = &(columns[col_i]->head);
-		columns[col_i]->head.down = node;
+	if (node->column->size == 0) {
+		node->up = &(node->column->head);
+		node->column->head.down = node;
 	} else {
 		// Insert as last element in that column
-		node->up = columns[col_i]->head.up;
-		columns[col_i]->head.up->down = node;
+		node->up = node->column->head.up;
+		node->column->head.up->down = node;
 	}
 
 	// Populate left and right fields
@@ -310,7 +310,7 @@ void ExactCover::link_node(
 		node->right = node;
 	}
 
-	columns[col_i]->size++;
+	node->column->size++;
 }
 
 // vi: set tabstop=4 softtabstop=4 shiftwidth=4 smarttab noexpandtab:
