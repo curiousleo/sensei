@@ -47,7 +47,7 @@ bool ExactCover::search() {
 				cur_column = smallest_column();
 				cover_column(cur_column);
 
-				// Choose row nondetermilistically
+				// Choose row nondeterministically
 				cur_node = cur_column->head.down;
 				choice.push_back(cur_node);
 
@@ -75,6 +75,8 @@ bool ExactCover::search() {
 				if (choice.size() == 1) {
 					mode = DONE; continue;
 				}
+
+				choice.pop_back();
 
 				cur_node = choice.back();
 				cur_column = cur_node->column;
