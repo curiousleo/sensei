@@ -7,7 +7,7 @@ enum SearchMode {FORWARD, ADVANCE, BACKUP, RECOVER, DONE};
 // Classes & Structs
 struct ExactCoverNode;
 struct ExactCoverColumn;
-struct ExactCover;
+class ExactCover;
 
 // Knuth: "data object x" or node_struct
 struct ExactCoverNode {
