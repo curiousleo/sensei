@@ -8,7 +8,7 @@ ExactCover::ExactCover() {
 	cur_column = NULL;
 }
 
-ExactCover::ExactCover(const std::list<std::list<int> > rows) {
+ExactCover::ExactCover(const std::list<std::list<int> > &rows) {
 	cur_node = NULL;
 	cur_column = NULL;
 
@@ -192,7 +192,7 @@ void ExactCover::uncover_column(ExactCoverColumn *column) {
 	}
 }
 
-void ExactCover::set_rows(const std::list<std::list<int> > rows) {
+void ExactCover::set_rows(const std::list<std::list<int> > &rows) {
 	std::list<std::list<int> >::const_iterator row_it;
 
 	// Clear columns & rows
@@ -254,7 +254,7 @@ void ExactCover::init_columns(const int col_count) {
 	}
 }
 
-void ExactCover::add_row(const std::list<int> row, const int row_i) {
+void ExactCover::add_row(const std::list<int> &row, const int row_i) {
 	ExactCoverNode *row_start = NULL;
 
 	// Add each element (node)

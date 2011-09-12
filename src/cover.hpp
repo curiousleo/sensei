@@ -32,13 +32,13 @@ class ExactCover {
 public:
 	// Constructors
 	ExactCover();
-	ExactCover(const std::list<std::list<int> > rows);
+	ExactCover(const std::list<std::list<int> > &rows);
 
 	// Destructor
 	~ExactCover();
 
 	// Public prototypes
-	void set_rows(const std::list<std::list<int> > rows);
+	void set_rows(const std::list<std::list<int> > &rows);
 	bool search();
 
 	// Public members
@@ -51,7 +51,7 @@ private:
 	void uncover_row(ExactCoverNode*);
 	void uncover_column(ExactCoverColumn*);
 
-	void add_row(const std::list<int> row, const int row_id);
+	void add_row(const std::list<int> &row, const int row_id);
 	void init_columns(const int col_count);
 	void link_node(const int row_i, const int col_i, ExactCoverNode **row_start);
 	ExactCoverColumn *smallest_column();
