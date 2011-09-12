@@ -138,8 +138,8 @@ void ExactCover::cover_row(ExactCoverNode *row) {
 void ExactCover::uncover_row(ExactCoverNode *row) {
 	// Uncover each column linked to this row
 	for (
-			ExactCoverNode *node = row->right;
-			node != row; node = node->right) {
+			ExactCoverNode *node = row->left;
+			node != row; node = node->left) {
 		uncover_column(node->column);
 	}
 }
@@ -150,7 +150,7 @@ void ExactCover::cover_column(ExactCoverColumn *column) {
 	column->next->prev = column->prev;
 
 	// Cover each row this column points to
-	// Go through each row
+	// Go through each row of the column
 	for (
 			ExactCoverNode *row = column->head.down;
 			row != &(column->head); row = row->down) {
@@ -175,15 +175,15 @@ void ExactCover::uncover_column(ExactCoverColumn *column) {
 	column->prev->next = column->next->prev = column;
 	
 	// Uncover each row this column points to
-	// Go through each row
+	// Go through each row of the column
 	for (
-			ExactCoverNode *row = column->head.down;
-			row != &(column->head); row = row->down) {
+			ExactCoverNode *row = column->head.up;
+			row != &(column->head); row = row->up) {
 
 		// Go through each node in that row
 		for (
-				ExactCoverNode *node = row->right;
-				node != row; node = node->right) {
+				ExactCoverNode *node = row->left;
+				node != row; node = node->left) {
 
 			// Re-insert node into column
 			node->up->down = node->down->up = node;
