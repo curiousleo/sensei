@@ -3,15 +3,10 @@
 
 #include "cover.hpp"
 
-ExactCover::ExactCover() {
-	cur_node = NULL;
-	cur_column = NULL;
-}
+ExactCover::ExactCover(): cur_node(NULL), cur_column(NULL) { }
 
-ExactCover::ExactCover(const std::list<std::list<int> > &rows) {
-	cur_node = NULL;
-	cur_column = NULL;
-
+ExactCover::ExactCover(const std::list<std::list<int> > &rows):
+		cur_node(NULL), cur_column(NULL) {
 	set_rows(rows);
 }
 
