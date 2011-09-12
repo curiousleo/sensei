@@ -218,7 +218,7 @@ void ExactCover::set_rows(const std::list<std::list<int> > &rows) {
 	// Add each row
 	int row_i = 0;
 	for (row_it = rows.begin(); row_it != rows.end(); ++row_it) {
-		add_row((*row_it), row_i);
+		add_row(*row_it, row_i);
 		++row_i;
 	}
 }
