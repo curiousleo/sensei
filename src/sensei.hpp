@@ -13,13 +13,13 @@ typedef std::array<Values, 81> Sudoku;
 
 // Prototypes
 void init(void);
-void read(Sudoku&, const std::string);
-void display(const Sudoku&);
-bool solve(Sudoku&);
+void read(Sudoku &, const std::string);
+void display(const Sudoku &);
+bool solve(Sudoku &);
 
-void assign(Sudoku&, tiny, tiny);
-void eliminate(Sudoku&);
-bool solved(const Sudoku&);
+void assign(Sudoku &, tiny, tiny);
+void eliminate(Sudoku &);
+bool solved(const Sudoku &);
 
 void read_solve_display_loop(void);
 
