@@ -21,6 +21,6 @@ void assign(Sudoku&, tiny, tiny);
 void eliminate(Sudoku&);
 bool solved(const Sudoku&);
 
-void solve_worker(void);
+void read_solve_display_loop(void);
 
 #endif // GUARD_sensei_h guard

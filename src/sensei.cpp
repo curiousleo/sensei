@@ -2,13 +2,12 @@
 
 #include <algorithm>
 #include <array>
+#include <iomanip>
 #include <iostream>
 #include <set>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <boost/thread.hpp>
 
 #include "sensei.hpp"
 
@@ -17,56 +16,34 @@ std::array<std::array<tiny, 9>, 27> units;
 // 81 cells, 20 peer cells each
 std::array<std::set<tiny>, 81> peers;
 
-boost::mutex cin_mutex;
-boost::shared_mutex cout_mutex;
-
 int main() {
-	static const int thread_number = boost::thread::hardware_concurrency();
-	std::vector<boost::thread> threads;
-
-	// Initialize 'units' and 'peers' vectors
 	init();
-
-	// Create and start worker threads
-	for (int i = 0; i != thread_number; ++i) {
-		threads.push_back(boost::thread(solve_worker));
-	}
-
-	// Join worker threads
-	for (
-			std::vector<boost::thread>::iterator thread_it = threads.begin();
-			thread_it != threads.end(); ++thread_it) {
-		thread_it->join();
-	}
+	read_solve_display_loop();
 
 	return 0;
 }
 
-void solve_worker() {
+void read_solve_display_loop() {
 	// Read input from pipe or terminal
 	Sudoku sudoku;
 	std::string s_str;
 
-	cin_mutex.lock();
 	while (std::cin >> s_str) {
-		cin_mutex.unlock();
-
 		read(sudoku, s_str);
 		eliminate(sudoku);
 		solve(sudoku);
 
-		cout_mutex.lock();
+#ifndef NDEBUG
 		display(sudoku);
-		cout_mutex.unlock();
-
-		cin_mutex.lock();
+#endif // NDEBUG
 	}
-	cin_mutex.unlock();
 }
 
 void read(Sudoku& sudoku, const std::string s_str) {
+#ifndef NDEBUG
 	if (s_str.size() < 81)
 		throw std::range_error("Sudoku string too short");
+#endif // NDEBUG
 
 	// Populate new Sudoku with default values
 	static const std::set<tiny> defaults = {1, 2, 3, 4, 5, 6, 7, 8, 9};
@@ -74,7 +51,9 @@ void read(Sudoku& sudoku, const std::string s_str) {
 
 	tiny val;
 
+#ifndef NDEBUG
 	try {
+#endif // NDEBUG
 		for (tiny cell_i = 0; cell_i != 81; ++cell_i) {
 			val = s_str[cell_i];
 			if (val == '.' || val == '0')
@@ -83,11 +62,13 @@ void read(Sudoku& sudoku, const std::string s_str) {
 			else
 				assign(sudoku, cell_i, (tiny)(val - '0'));
 		}
+#ifndef NDEBUG
 	} catch (std::exception e) {
 		// Catch out of bounds (end of string reached)
 		// or logic error (from assignment)
 		std::cerr << "Error reading Sudoku: " << e.what() << std::endl;
 	}
+#endif // NDEBUG
 }
 
 void display(const Sudoku& sudoku) {
@@ -161,10 +142,14 @@ bool solve(Sudoku& sudoku) {
 			guess_it != sudoku[min_cell_i].end(); ++guess_it) {
 		Sudoku guess_sudoku(sudoku);
 
+#ifndef NDEBUG
 		try {
+#endif // NDEBUG
 			assign(guess_sudoku, min_cell_i, (*guess_it));
 			eliminate(guess_sudoku);
+#ifndef NDEBUG
 		} catch (std::exception) { continue; }
+#endif
 
 		if (solve(guess_sudoku)) {
 			sudoku = guess_sudoku;
@@ -178,10 +163,12 @@ bool solve(Sudoku& sudoku) {
 void assign(Sudoku& sudoku, tiny cell_i, tiny val) {
 	/* If a cell has only one possible value, then eliminate that value
 	 * from the cell's peers. */
+#ifndef NDEBUG
 	if (std::find(sudoku[cell_i].begin(), sudoku[cell_i].end(), val) == sudoku[cell_i].end())
 		throw std::range_error("Assignation not possible: value not in set of possible values");
 	if (val > 9)
 		throw std::out_of_range("Value is not valid");
+#endif // NDEBUG
 
 	sudoku[cell_i] = {val};
 
@@ -189,8 +176,10 @@ void assign(Sudoku& sudoku, tiny cell_i, tiny val) {
 			std::set<tiny>::const_iterator it = peers[cell_i].begin();
 			it != peers[cell_i].end(); ++it) {
 		sudoku[*it].erase(val);
+#ifndef NDEBUG
 		if (sudoku[*it].size() == 0)
 			throw std::logic_error("Peer has no possibilities left");
+#endif // NDEBUG
 	}
 }
 
